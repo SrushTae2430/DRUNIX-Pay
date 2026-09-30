@@ -1,0 +1,3056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRUNIX Pay — Resilient Payments for Low-Connectivity India</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090e17;
+      --bg-card: #111927;
+      --bg-card-hover: #1a2436;
+      --bg-glass: rgba(17, 25, 39, 0.75);
+      --border: #1e293b;
+      --border-focus: #3b82f6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.25);
+      --accent-green: #10b981;
+      --accent-green-bg: rgba(16, 185, 129, 0.12);
+      --accent-amber: #f59e0b;
+      --accent-amber-bg: rgba(245, 158, 11, 0.12);
+      --accent-red: #ef4444;
+      --accent-red-bg: rgba(239, 68, 68, 0.12);
+      --accent-purple: #8b5cf6;
+      --citi-blue: #003b70;
+      --citi-red: #d9272e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.5;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-dim);
+    }
+
+    /* Top Navigation Bar */
+    header.top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(9, 14, 23, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-logo svg {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+    .citi-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(0, 59, 112, 0.4);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #93c5fd;
+    }
+    .citi-arc {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--citi-red);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      background: rgba(17, 25, 39, 0.9);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .nav-btn:hover {
+      color: var(--text-main);
+      background: var(--bg-card-hover);
+    }
+    .nav-btn.active {
+      color: #ffffff;
+      background: var(--primary);
+      box-shadow: 0 2px 8px var(--primary-glow);
+    }
+
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .status-pill .indicator-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      position: relative;
+    }
+    .status-pill.online .indicator-dot {
+      background: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green);
+    }
+    .status-pill.limited .indicator-dot {
+      background: var(--accent-amber);
+      box-shadow: 0 0 10px var(--accent-amber);
+    }
+    .status-pill.offline .indicator-dot {
+      background: var(--accent-red);
+      box-shadow: 0 0 10px var(--accent-red);
+    }
+    .status-pill.online {
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+    }
+    .status-pill.limited {
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #fcd34d;
+    }
+    .status-pill.offline {
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+
+    .btn-judge-quick {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-judge-quick:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    /* Main Container */
+    main.content-area {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Common Card Styles */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-green { background: var(--accent-green-bg); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-amber { background: var(--accent-amber-bg); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-red { background: var(--accent-red-bg); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .badge-purple { background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3); }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: var(--primary-light);
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+    .btn-secondary {
+      background: var(--bg-card-hover);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: #253349;
+    }
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.35);
+    }
+    .btn-success {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .btn-success:hover {
+      background: rgba(16, 185, 129, 0.35);
+    }
+    .btn-amber {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+    .btn-amber:hover {
+      background: rgba(245, 158, 11, 0.35);
+    }
+    .btn-block {
+      width: 100%;
+    }
+
+    /* Grid layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 992px) {
+      .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Monospace Text */
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    table.data-table th {
+      background: #0d1522;
+      padding: 12px 14px;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+    table.data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #162030;
+      color: var(--text-main);
+    }
+    table.data-table tr:last-child td {
+      border-bottom: none;
+    }
+    table.data-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Mobile Phone Mockup */
+    .phone-container {
+      width: 375px;
+      min-height: 720px;
+      background: #020617;
+      border: 10px solid #1e293b;
+      border-radius: 44px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(37, 99, 235, 0.15);
+      margin: 0 auto;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .phone-notch {
+      width: 130px;
+      height: 22px;
+      background: #1e293b;
+      margin: 0 auto;
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+      position: relative;
+      z-index: 10;
+    }
+    .phone-speaker {
+      width: 48px;
+      height: 4px;
+      background: #334155;
+      border-radius: 2px;
+      margin: 5px auto 0;
+    }
+    .phone-camera {
+      width: 8px;
+      height: 8px;
+      background: #0f172a;
+      border-radius: 50%;
+      position: absolute;
+      right: 18px;
+      top: 6px;
+      border: 1px solid #334155;
+    }
+    .phone-screen {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      position: relative;
+    }
+    .phone-status-bar {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      padding: 0 4px;
+    }
+
+    /* Animated Pipeline */
+    .pipeline-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      margin: 20px 0;
+      overflow-x: auto;
+      padding: 12px 0;
+    }
+    .pipeline-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      min-width: 90px;
+    }
+    .pipeline-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all 0.3s;
+      color: var(--text-muted);
+    }
+    .pipeline-step.active .pipeline-icon {
+      border-color: var(--primary-light);
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 0 16px var(--primary-glow);
+      transform: scale(1.1);
+    }
+    .pipeline-step.completed .pipeline-icon {
+      border-color: var(--accent-green);
+      background: var(--accent-green);
+      color: white;
+    }
+    .pipeline-label {
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 8px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .pipeline-step.active .pipeline-label {
+      color: var(--primary-light);
+    }
+    .pipeline-line {
+      position: absolute;
+      top: 32px;
+      left: 5%;
+      width: 90%;
+      height: 2px;
+      background: var(--border);
+      z-index: 1;
+    }
+    .pipeline-progress {
+      position: absolute;
+      top: 32px;
+      left: 5%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-green), var(--primary-light));
+      z-index: 1;
+      width: 0%;
+      transition: width 0.6s ease;
+    }
+
+    /* Modal / Popups */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.show {
+      display: flex;
+    }
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      max-width: 520px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+      position: relative;
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalPop {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    /* Floating Judge Drawer / Controls */
+    .judge-floating-panel {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1500;
+      background: rgba(17, 25, 39, 0.95);
+      border: 1px solid #3b82f6;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(59, 130, 246, 0.3);
+      max-width: 440px;
+      backdrop-filter: blur(12px);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .judge-floating-panel.minimized {
+      transform: translateY(calc(100% - 48px));
+    }
+    .judge-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+    .judge-panel-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #93c5fd;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .judge-grid-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .btn-judge {
+      padding: 7px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 8px;
+      text-align: left;
+      border: 1px solid var(--border);
+      background: var(--bg-card-hover);
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .btn-judge:hover {
+      border-color: var(--primary-light);
+      background: #233147;
+    }
+
+    /* Hero section */
+    .hero-banner {
+      background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.2), transparent 50%),
+                  radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.1), transparent 50%),
+                  var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-title {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      max-width: 800px;
+    }
+    .hero-subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 720px;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    /* State Machine Node Styles */
+    .sm-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin: 16px 0;
+    }
+    .sm-node {
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .sm-node.active {
+      border-color: var(--primary-light);
+      background: rgba(37, 99, 235, 0.2);
+      color: #93c5fd;
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+    .sm-node.done {
+      border-color: var(--accent-green);
+      background: var(--accent-green-bg);
+      color: #6ee7b7;
+    }
+    .sm-node.exception {
+      border-color: var(--accent-red);
+      background: var(--accent-red-bg);
+      color: #fca5a5;
+    }
+    .sm-arrow {
+      color: var(--text-dim);
+      font-weight: 800;
+    }
+
+    /* Hash Box */
+    .hash-token-box {
+      background: #090e17;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #93c5fd;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      word-break: break-all;
+    }
+
+    /* Demo scene stepper */
+    .scene-step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .scene-step-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .scene-step-card.active {
+      border-color: var(--primary-light);
+      background: rgba(37, 99, 235, 0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Global Header -->
+  <header class="top-bar">
+    <div class="brand-wrap">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        <span>DRUNIX Pay</span>
+      </div>
+      <div class="citi-badge">
+        <span class="citi-arc"></span>
+        <span>Citi Hackathon | Financial Inclusion</span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="nav-btn active" onclick="switchTab('tab-overview')">🚀 Overview & Demo</button>
+      <button class="nav-btn" onclick="switchTab('tab-customer')">📱 Customer App</button>
+      <button class="nav-btn" onclick="switchTab('tab-merchant')">🏪 Merchant Dashboard</button>
+      <button class="nav-btn" onclick="switchTab('tab-connectivity')">⚡ Connectivity Simulator</button>
+      <button class="nav-btn" onclick="switchTab('tab-risk')">🛡️ Risk & Vault</button>
+      <button class="nav-btn" onclick="switchTab('tab-reconcile')">⚖️ Reconciliation</button>
+      <button class="nav-btn" onclick="switchTab('tab-observability')">📊 Observability</button>
+      <button class="nav-btn" onclick="switchTab('tab-architecture')">🏛️ Architecture & APIs</button>
+    </nav>
+
+    <!-- Right Controls -->
+    <div class="top-controls">
+      <div id="global-status-pill" class="status-pill online" onclick="cycleConnectivity()" title="Click to cycle connectivity mode">
+        <span class="indicator-dot"></span>
+        <span id="global-status-text">🟢 ONLINE</span>
+        <span class="mono" id="global-ping-text" style="font-size:11px; opacity:0.8;">42ms</span>
+      </div>
+      <button class="btn-judge-quick" onclick="openJudgePanel()">
+        ⚡ Judge Controls
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Viewport -->
+  <main class="content-area">
+
+    <!-- ==================== TAB 1: OVERVIEW & 3-MIN SCRIPTED DEMO ==================== -->
+    <section id="tab-overview" class="tab-content active">
+      <div class="hero-banner">
+        <div style="display:inline-block; margin-bottom:12px;" class="badge badge-blue">
+          DRUNIX Hackathon in collaboration with Citi • Domain: Financial Inclusion
+        </div>
+        <h1 class="hero-title">Payments That Don't Stop When Connectivity Does.</h1>
+        <p class="hero-subtitle">
+          DRUNIX Pay enables resilient small-value digital payments across unreliable connectivity environments (rural outposts, underground metro basements, network congestion), with tamper-evident local vault handling, instant duplicate protection, and automated multi-way reconciliation.
+        </p>
+
+        <!-- Innovation Banner -->
+        <div style="background:rgba(2, 6, 23, 0.6); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:24px;">
+          <div style="font-size:12px; font-weight:700; color:#93c5fd; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+            The Core Architecture Paradigm
+          </div>
+          <div style="font-size:18px; font-weight:800; color:#f8fafc; display:flex; flex-wrap:wrap; align-items:center; gap:10px;">
+            <span style="color:#60a5fa;">PAY NOW</span>
+            <span style="color:var(--text-dim);">→</span>
+            <span style="color:#a78bfa;">SECURELY STORE</span>
+            <span style="color:var(--text-dim);">→</span>
+            <span style="color:#fbbf24;">VERIFY</span>
+            <span style="color:var(--text-dim);">→</span>
+            <span style="color:#34d399;">SYNC</span>
+            <span style="color:var(--text-dim);">→</span>
+            <span style="color:#38bdf8;">RECONCILE</span>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:center;">
+          <button class="btn btn-primary" onclick="switchTab('tab-customer')">
+            📱 Launch Customer App Demo
+          </button>
+          <button class="btn btn-secondary" onclick="startGuidedDemo()">
+            ▶️ Run 3-Minute Scripted Judge Demo
+          </button>
+          <button class="btn btn-secondary" onclick="switchTab('tab-architecture')">
+            🏛️ View Resilience Architecture
+          </button>
+        </div>
+      </div>
+
+      <!-- Key Differentiator Callout -->
+      <div class="card" style="margin-bottom:24px; border-left: 4px solid var(--primary-light);">
+        <div style="font-size:20px; font-weight:800; color:#ffffff; margin-bottom:8px;">
+          “Offline is not the feature. Resilience is the feature.”
+        </div>
+        <p style="color:var(--text-muted); font-size:14px; margin-bottom:14px;">
+          Traditional payment systems fail completely when connectivity drops, leading to uncertain transaction states, repeated payment attempts, customer anxiety, and merchant refusal. DRUNIX Pay solves this through eight foundational pillars:
+        </p>
+        <div class="grid-4">
+          <div style="background:#090e17; padding:12px; border-radius:10px; border:1px solid var(--border);">
+            <div style="color:#60a5fa; font-weight:700; font-size:13px; margin-bottom:4px;">1. Connectivity Failure</div>
+            <div style="color:var(--text-muted); font-size:12px;">Zero app crashes; seamless fallback to local secure storage.</div>
+          </div>
+          <div style="background:#090e17; padding:12px; border-radius:10px; border:1px solid var(--border);">
+            <div style="color:#34d399; font-weight:700; font-size:13px; margin-bottom:4px;">2. Transaction Uncertainty</div>
+            <div style="color:var(--text-muted); font-size:12px;">Clear, honest status: 'Payment securely recorded — waiting for sync'.</div>
+          </div>
+          <div style="background:#090e17; padding:12px; border-radius:10px; border:1px solid var(--border);">
+            <div style="color:#f87171; font-weight:700; font-size:13px; margin-bottom:4px;">3. Duplicate Payment Risk</div>
+            <div style="color:var(--text-muted); font-size:12px;">Intelligent heuristics flag duplicate taps to prevent double billing.</div>
+          </div>
+          <div style="background:#090e17; padding:12px; border-radius:10px; border:1px solid var(--border);">
+            <div style="color:#fbbf24; font-weight:700; font-size:13px; margin-bottom:4px;">4. Local Secure Vault</div>
+            <div style="color:var(--text-muted); font-size:12px;">Hardware keystore attestation and HMAC-SHA256 tamper-evidence.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-Minute Guided Demo Script Navigator -->
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-title">
+          <span>⏱️ 3-Minute Judge Demo Script (8 Interactive Scenes)</span>
+          <span class="badge badge-purple">Click any scene to simulate live</span>
+        </div>
+        <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px;">
+          Judges can step through each scene with one click or let the automated runner execute the complete lifecycle end-to-end:
+        </p>
+
+        <div class="grid-4" id="scene-cards-container">
+          <div class="scene-step-card active" onclick="executeScene(1)">
+            <div class="badge badge-blue" style="margin-bottom:6px;">Scene 1</div>
+            <div style="font-weight:700; font-size:13px;">Customer Online</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+              User has ₹1,850 offline wallet capacity on 4G network.
+            </div>
+          </div>
+          <div class="scene-step-card" onclick="executeScene(2)">
+            <div class="badge badge-red" style="margin-bottom:6px;">Scene 2</div>
+            <div style="font-weight:700; font-size:13px;">Switch to Offline</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+              Simulate internet drop. UI enters Resilient Mode; eligible payments continue.
+            </div>
+          </div>
+          <div class="scene-step-card" onclick="executeScene(3)">
+            <div class="badge badge-amber" style="margin-bottom:6px;">Scene 3</div>
+            <div style="font-weight:700; font-size:13px;">Pay ₹450 to Sharma</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+              Scan merchant QR, evaluate risk, issue DRX-2026-001284 in local vault.
+            </div>
+          </div>
+          <div class="scene-step-card" onclick="executeScene(4)">
+            <div class="badge badge-red" style="margin-bottom:6px;">Scene 4</div>
+            <div style="font-weight:700; font-size:13px;">Duplicate Attempt</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+              User re-taps pay. System catches duplicate and displays warning modal!
+            </div>
+          </div>
+          <div class="scene-step-card" onclick="executeScene(5)">
+            <div class="badge badge-green" style="margin-bottom:6px;">Scene 5</div>
+            <div style="font-weight:700; font-size:13px;">Restore & Auto-Sync</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+              Network returns. Auto-sync verifies HMAC and settles queued transactions.
+            </div>
+          </div>
+          <div class="scene-step-card" onclick="executeScene(6)">
+            <div class="badge badge-purple" style="margin-bottom:6px;">Scene 6</div>
+            <div style="font-weight:700; font-size:13px;">Merchant Dashboard</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+              Sharma General Store sees ₹450 reconciled with digital receipt.
+            </div>
+          </div>
+          <div class="scene-step-card" onclick="executeScene(7)">
+            <div class="badge badge-blue" style="margin-bottom:6px;">Scene 7</div>
+            <div style="font-weight:700; font-size:13px;">Transaction Lifecycle</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+              Inspect audit trail from CREATED to SETTLED across all states.
+            </div>
+          </div>
+          <div class="scene-step-card" onclick="executeScene(8)">
+            <div class="badge badge-green" style="margin-bottom:6px;">Scene 8</div>
+            <div style="font-weight:700; font-size:13px;">Architecture Proof</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+              Resilience layer integration with UPI switches and banking nodes.
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px; background:#090e17; border-radius:10px; padding:12px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span style="font-size:12px; font-weight:700; color:#93c5fd;">Active Scene Feedback: </span>
+            <span id="scene-feedback-text" style="font-size:12px; color:var(--text-main);">Scene 1 Active: Priya Sharma account initialized online with ₹1,850 balance.</span>
+          </div>
+          <button class="btn btn-primary" style="padding:6px 14px; font-size:12px;" onclick="nextScene()">
+            Next Step →
+          </button>
+        </div>
+      </div>
+
+      <!-- Prototype Simulation Metrics Banner (Section 28) -->
+      <div class="card">
+        <div class="card-title">
+          <span>📈 Judge-Facing Impact Metrics</span>
+          <span class="badge badge-amber">Prototype simulation metrics — for demonstration only</span>
+        </div>
+        <div class="grid-4" style="text-align:center;">
+          <div style="background:#090e17; padding:16px; border-radius:12px; border:1px solid var(--border);">
+            <div style="font-size:28px; font-weight:800; color:#34d399;">98%</div>
+            <div style="font-size:12px; color:var(--text-muted); font-weight:600;">Offline Transaction Continuity</div>
+          </div>
+          <div style="background:#090e17; padding:16px; border-radius:12px; border:1px solid var(--border);">
+            <div style="font-size:28px; font-weight:800; color:#60a5fa;">94%</div>
+            <div style="font-size:12px; color:var(--text-muted); font-weight:600;">Duplicate Prevention Rate</div>
+          </div>
+          <div style="background:#090e17; padding:16px; border-radius:12px; border:1px solid var(--border);">
+            <div style="font-size:28px; font-weight:800; color:#a78bfa;">97%</div>
+            <div style="font-size:12px; color:var(--text-muted); font-weight:600;">Automatic Reconciliation</div>
+          </div>
+          <div style="background:#090e17; padding:16px; border-radius:12px; border:1px solid var(--border);">
+            <div style="font-size:28px; font-weight:800; color:#fbbf24;">&lt; 5 sec</div>
+            <div style="font-size:12px; color:var(--text-muted); font-weight:600;">Average Sync Time</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: CUSTOMER APP (MOBILE VIEWPORT) ==================== -->
+    <section id="tab-customer" class="tab-content">
+      <div class="grid-2" style="align-items:start;">
+        <!-- Left: Realistic Mobile Phone Interface -->
+        <div>
+          <div class="phone-container">
+            <div class="phone-notch">
+              <div class="phone-speaker"></div>
+              <div class="phone-camera"></div>
+            </div>
+
+            <div class="phone-screen" id="phone-screen-body">
+              <!-- Status Bar -->
+              <div class="phone-status-bar">
+                <span>09:41 AM</span>
+                <span id="phone-network-icon" style="display:flex; align-items:center; gap:4px;">
+                  <span id="phone-network-text">4G</span> 📶 🔋 94%
+                </span>
+              </div>
+
+              <!-- Phone App Header -->
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#3b82f6,#1d4ed8); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">
+                    PS
+                  </div>
+                  <div>
+                    <div style="font-size:13px; font-weight:700;">Priya Sharma</div>
+                    <div class="mono" style="font-size:10px; color:var(--text-muted);">priya@okaxis</div>
+                  </div>
+                </div>
+                <div id="phone-connectivity-badge" class="badge badge-green" style="font-size:10px;">
+                  🟢 ONLINE
+                </div>
+              </div>
+
+              <!-- Offline Mode Active Notice Card -->
+              <div id="offline-mode-callout" style="display:none; background:rgba(239, 68, 68, 0.15); border:1px solid rgba(239,68,68,0.4); border-radius:12px; padding:10px 12px; margin-bottom:12px;">
+                <div style="display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:#fca5a5;">
+                  <span>🔴 Offline Mode Active</span>
+                </div>
+                <p style="font-size:11px; color:#f8fafc; margin-top:2px; line-height:1.3;">
+                  You can make eligible small-value payments even when connectivity is unavailable.
+                </p>
+              </div>
+
+              <!-- Wallet Balance Card -->
+              <div style="background:linear-gradient(135deg, #1e3a8a, #0f172a); border:1px solid #2563eb; border-radius:18px; padding:16px; margin-bottom:16px; box-shadow:0 8px 20px rgba(0,0,0,0.4);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                  <span style="font-size:11px; color:#93c5fd; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Available Offline Balance</span>
+                  <span class="badge badge-blue" style="font-size:9px;">DEVICE VAULT</span>
+                </div>
+                <div style="font-size:30px; font-weight:800; color:#ffffff; letter-spacing:-0.5px; margin-bottom:10px;">
+                  ₹<span id="cust-offline-balance">1,850</span>
+                </div>
+
+                <!-- Offline Capacity Progress -->
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:10px; color:#93c5fd; margin-bottom:4px;">
+                    <span>Offline Payment Capacity</span>
+                    <span id="cust-capacity-label">₹1,850 / ₹5,000</span>
+                  </div>
+                  <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+                    <div id="cust-capacity-bar" style="width:37%; height:100%; background:linear-gradient(90deg, #38bdf8, #34d399); border-radius:3px;"></div>
+                  </div>
+                </div>
+
+                <!-- Stats Footer -->
+                <div style="display:flex; justify-content:space-between; margin-top:14px; pt:8px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:#bfdbfe;">
+                  <div>Today's Offline Txns: <strong id="cust-today-offline">7</strong></div>
+                  <div>Pending Sync: <strong id="cust-pending-sync" style="color:#fcd34d;">2</strong></div>
+                </div>
+              </div>
+
+              <!-- Quick Action Buttons -->
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+                <button class="btn btn-primary" onclick="openPaymentFlow('merch_sharma_01', 450)" style="padding:12px 8px; font-size:12px; flex-direction:column; gap:4px;">
+                  <span style="font-size:18px;">📷</span>
+                  <span>Scan & Pay</span>
+                </button>
+                <button class="btn btn-secondary" onclick="openPaymentFlow('merch_metro_04', 120)" style="padding:12px 8px; font-size:12px; flex-direction:column; gap:4px;">
+                  <span style="font-size:18px;">📶</span>
+                  <span>Tap & Pay</span>
+                </button>
+                <button class="btn btn-secondary" id="btn-send-money" onclick="alert('Feature requires live online core banking verification. Disabled in pure offline mode.')" style="padding:12px 8px; font-size:12px; flex-direction:column; gap:4px;">
+                  <span style="font-size:18px;">💸</span>
+                  <span>Send Money</span>
+                </button>
+                <button class="btn btn-secondary" onclick="switchTab('tab-reconcile')" style="padding:12px 8px; font-size:12px; flex-direction:column; gap:4px;">
+                  <span style="font-size:18px;">📜</span>
+                  <span>Txn History</span>
+                </button>
+              </div>
+
+              <!-- Eligible Offline Merchants List -->
+              <div style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:12px; font-weight:700; color:var(--text-muted);">Quick Pay Merchants</span>
+                <span style="font-size:10px; color:#38bdf8;">Offline Enabled</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <div style="background:#0f172a; border:1px solid var(--border); border-radius:10px; padding:10px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="openPaymentFlow('merch_sharma_01', 450)">
+                  <div>
+                    <div style="font-size:12px; font-weight:700;">Sharma General Store</div>
+                    <div class="mono" style="font-size:10px; color:var(--text-muted);">sharma@demo • Groceries</div>
+                  </div>
+                  <div style="text-align:right;">
+                    <div style="font-weight:700; font-size:12px; color:#38bdf8;">₹450</div>
+                    <span class="badge badge-green" style="font-size:8px;">Pay Now</span>
+                  </div>
+                </div>
+
+                <div style="background:#0f172a; border:1px solid var(--border); border-radius:10px; padding:10px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="openPaymentFlow('merch_patel_02', 250)">
+                  <div>
+                    <div style="font-size:12px; font-weight:700;">Patel Medical & General</div>
+                    <div class="mono" style="font-size:10px; color:var(--text-muted);">patel@demo • Pharmacy</div>
+                  </div>
+                  <div style="text-align:right;">
+                    <div style="font-weight:700; font-size:12px; color:#38bdf8;">₹250</div>
+                    <span class="badge badge-green" style="font-size:8px;">Pay Now</span>
+                  </div>
+                </div>
+
+                <div style="background:#0f172a; border:1px solid var(--border); border-radius:10px; padding:10px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="openPaymentFlow('merch_metro_04', 85)">
+                  <div>
+                    <div style="font-size:12px; font-weight:700;">Metro Underground Cafe</div>
+                    <div class="mono" style="font-size:10px; color:var(--text-muted);">metrocafe@demo • Basement Food</div>
+                  </div>
+                  <div style="text-align:right;">
+                    <div style="font-weight:700; font-size:12px; color:#38bdf8;">₹85</div>
+                    <span class="badge badge-green" style="font-size:8px;">Pay Now</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Vault Status Mini Footer -->
+              <div style="margin-top:auto; pt:12px; display:flex; align-items:center; justify-content:space-between; font-size:10px; color:var(--text-dim); border-top:1px solid var(--border);">
+                <span>🔒 Secure Keystore Attested</span>
+                <span style="color:#34d399;">SHA-256 Tamper Proof</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Flow Explanation & Offline Capabilities Matrix -->
+        <div>
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-title">
+              <span>🎯 Payment Capability Matrix by Network State</span>
+            </div>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:14px;">
+              When connectivity is severed, DRUNIX Pay protects the customer and merchant by continuing small-value offline-eligible transactions while selectively disabling operations that strictly require live bank core connectivity.
+            </p>
+
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Capability</th>
+                    <th>Online State</th>
+                    <th>Limited / Offline State</th>
+                    <th>Reasoning / Safeguard</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>QR Scan & In-Store Pay</strong></td>
+                    <td><span class="badge badge-green">✓ Full Realtime</span></td>
+                    <td><span class="badge badge-green">✓ Eligible (≤ ₹2,000)</span></td>
+                    <td>Cryptographic vault voucher created locally</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tap & Pay (NFC / Proximity)</strong></td>
+                    <td><span class="badge badge-green">✓ Enabled</span></td>
+                    <td><span class="badge badge-green">✓ Enabled</span></td>
+                    <td>Device-to-terminal token exchange</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Duplicate Prevention</strong></td>
+                    <td><span class="badge badge-green">✓ Server Check</span></td>
+                    <td><span class="badge badge-amber">✓ Local Vault Filter</span></td>
+                    <td>Blocks re-taps for same merchant + amount</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Direct Bank-to-Bank Wire</strong></td>
+                    <td><span class="badge badge-green">✓ Available</span></td>
+                    <td><span class="badge badge-red">✗ Disabled</span></td>
+                    <td>Requires core banking live debit authorization</td>
+                  </tr>
+                  <tr>
+                    <td><strong>High-Value Spend (> ₹5,000)</strong></td>
+                    <td><span class="badge badge-green">✓ Available</span></td>
+                    <td><span class="badge badge-red">✗ Disabled</span></td>
+                    <td>Exceeds regulatory offline risk threshold</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Interactive Payment Simulation Trigger Card -->
+          <div class="card">
+            <div class="card-title">
+              <span>🧪 Quick Payment Simulation</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div style="display:flex; gap:10px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="openPaymentFlow('merch_sharma_01', 450)">
+                  Pay Sharma General Store (₹450)
+                </button>
+                <button class="btn btn-secondary" style="flex:1;" onclick="simulateDuplicateFlow()">
+                  Test Duplicate Protection
+                </button>
+              </div>
+              <div style="font-size:12px; color:var(--text-muted);">
+                💡 <em>Tip: Toggle Network to OFFLINE at the top, then press Pay to witness the offline secure recording without payment failure!</em>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: MERCHANT DASHBOARD ==================== -->
+    <section id="tab-merchant" class="tab-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h2 style="font-size:24px; font-weight:800;">Sharma General Store — POS Terminal</h2>
+          <div class="mono" style="font-size:12px; color:var(--text-muted);">
+            UPI ID: sharma@demo • Terminal ID: POS-SHARMA-01 • Category: Groceries & Provisions
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span id="merchant-conn-badge" class="badge badge-amber">CONNECTIVITY: LIMITED</span>
+          <button class="btn btn-secondary" onclick="loadMerchantDashboard()">🔄 Refresh Terminal</button>
+        </div>
+      </div>
+
+      <!-- Merchant KPI Cards (Section 15) -->
+      <div class="grid-3" style="margin-bottom:20px;">
+        <div class="card">
+          <div style="font-size:12px; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Today's Total Sales</div>
+          <div style="font-size:32px; font-weight:800; color:#38bdf8; margin:6px 0;" id="merch-today-sales">₹24,850</div>
+          <div style="font-size:12px; color:#34d399;">Includes online + reconciled offline settlements</div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:12px; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Offline Sales Captured</div>
+          <div style="font-size:32px; font-weight:800; color:#a78bfa; margin:6px 0;" id="merch-offline-sales">₹8,450</div>
+          <div style="font-size:12px; color:var(--text-muted);">Recorded locally with cryptographic proof</div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:12px; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Pending Sync Transactions</div>
+          <div style="font-size:32px; font-weight:800; color:#fbbf24; margin:6px 0;" id="merch-pending-sync">3</div>
+          <div style="font-size:12px; color:#fcd34d;">Awaiting bank gateway batch upload</div>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-bottom:24px;">
+        <div class="card">
+          <div style="font-size:12px; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Successful Transactions</div>
+          <div style="font-size:26px; font-weight:800; color:#34d399; margin:4px 0;" id="merch-successful">47</div>
+          <div style="font-size:11px; color:var(--text-muted);">100% verified against settlement ledger</div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:12px; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Exceptions / Inquiries</div>
+          <div style="font-size:26px; font-weight:800; color:#f87171; margin:4px 0;" id="merch-exceptions">1</div>
+          <div style="font-size:11px; color:var(--text-muted);">Flagged for manual audit review</div>
+        </div>
+
+        <div class="card">
+          <div style="font-size:12px; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Duplicate Attempts Intercepted</div>
+          <div style="font-size:26px; font-weight:800; color:#fb923c; margin:4px 0;" id="merch-duplicates">2</div>
+          <div style="font-size:11px; color:var(--text-muted);">Prevented customer double debit</div>
+        </div>
+      </div>
+
+      <!-- Merchant Transaction Table -->
+      <div class="card">
+        <div class="card-title">
+          <span>📋 Recent Transactions & Sync Status</span>
+          <span class="badge badge-blue">Real-time Terminal Stream</span>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Mode</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Sync Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="merchant-txns-tbody">
+              <!-- Dynamically populated -->
+              <tr>
+                <td class="mono">DRX001</td>
+                <td>Customer A</td>
+                <td><strong>₹450</strong></td>
+                <td><span class="badge badge-amber">OFFLINE</span></td>
+                <td>10:42 AM</td>
+                <td><span class="badge badge-green">Completed</span></td>
+                <td><span style="color:#34d399;">✓ Synced</span></td>
+                <td><button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;">Receipt</button></td>
+              </tr>
+              <tr>
+                <td class="mono">DRX002</td>
+                <td>Customer B</td>
+                <td><strong>₹300</strong></td>
+                <td><span class="badge badge-amber">OFFLINE</span></td>
+                <td>10:44 AM</td>
+                <td><span class="badge badge-amber">Pending</span></td>
+                <td><span style="color:#fbbf24;">⏳ Awaiting</span></td>
+                <td><button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;">Receipt</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: CONNECTIVITY SIMULATOR & AUTO-SYNC ==================== -->
+    <section id="tab-connectivity" class="tab-content">
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-title">
+          <span>⚡ Smart Connectivity Detection & Simulator (Section 4 & 12)</span>
+          <span class="badge badge-purple">Interactive Network Switcher</span>
+        </div>
+        <p style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">
+          Connectivity is rarely binary (ON/OFF) in Indian tier-2/tier-3 hubs, basement parking, or rural mandis. DRUNIX Pay continuously monitors telemetry (latency, packet loss, socket health) and switches dynamically between three operating modes:
+        </p>
+
+        <!-- 3 Network Selector Buttons -->
+        <div class="grid-3" style="margin-bottom:20px;">
+          <div id="card-sim-online" class="card" style="cursor:pointer; border:2px solid transparent;" onclick="setNetworkState('ONLINE')">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:16px; font-weight:800; color:#34d399;">🟢 ONLINE</span>
+              <span class="badge badge-green">Standard</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
+              High bandwidth 4G/5G connection. Real-time direct routing through standard payment gateways.
+            </div>
+            <div class="mono" style="font-size:11px; color:#93c5fd;">
+              Latency: 42 ms • Packet Loss: 0%
+            </div>
+          </div>
+
+          <div id="card-sim-limited" class="card" style="cursor:pointer; border:2px solid transparent;" onclick="setNetworkState('LIMITED')">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:16px; font-weight:800; color:#fbbf24;">🟠 LIMITED</span>
+              <span class="badge badge-amber">Resilient Mode</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
+              Intermittent 2G/EDGE or congested signal. Switching to resilient local vault recording.
+            </div>
+            <div class="mono" style="font-size:11px; color:#fbbf24;">
+              Latency: 780 ms • Packet Loss: 34%
+            </div>
+          </div>
+
+          <div id="card-sim-offline" class="card" style="cursor:pointer; border:2px solid transparent;" onclick="setNetworkState('OFFLINE')">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:16px; font-weight:800; color:#f87171;">🔴 OFFLINE</span>
+              <span class="badge badge-red">Zero Network</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
+              Complete network outage or deep underground. Payment continues via secure local keystore.
+            </div>
+            <div class="mono" style="font-size:11px; color:#f87171;">
+              Latency: ∞ ms • Packet Loss: 100%
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry readout -->
+        <div style="background:#090e17; border-radius:12px; padding:16px; border:1px solid var(--border);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div>
+              <span style="font-size:12px; color:var(--text-muted); font-weight:600;">System Telemetry Recommendation:</span>
+              <div id="sim-recommendation-text" style="font-size:14px; font-weight:700; color:#f8fafc; margin-top:2px;">
+                Standard online routing active.
+              </div>
+            </div>
+            <div style="display:flex; gap:12px;">
+              <div style="text-align:right;">
+                <div style="font-size:10px; color:var(--text-muted);">MEASURED LATENCY</div>
+                <div class="mono" style="font-weight:700; color:#60a5fa;" id="sim-latency-display">42 ms</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:10px; color:var(--text-muted);">SIMULATED LOSS</div>
+                <div class="mono" style="font-weight:700; color:#f87171;" id="sim-loss-display">0%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Animated Pipeline Indicator (Section 4) -->
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-title">
+          <span>🔄 End-to-End Resilience Lifecycle Pipeline</span>
+          <span class="badge badge-green">Animated State Flow</span>
+        </div>
+        <p style="color:var(--text-muted); font-size:13px;">
+          Watch the automatic transition when transactions move from disconnected initiation to full server settlement:
+        </p>
+
+        <div class="pipeline-container">
+          <div class="pipeline-line"></div>
+          <div class="pipeline-progress" id="lifecycle-progress-bar"></div>
+
+          <div class="pipeline-step completed" id="pipe-step-1">
+            <div class="pipeline-icon">🔴</div>
+            <div class="pipeline-label">Offline</div>
+          </div>
+          <div class="pipeline-step completed" id="pipe-step-2">
+            <div class="pipeline-icon">📦</div>
+            <div class="pipeline-label">Queued Locally</div>
+          </div>
+          <div class="pipeline-step" id="pipe-step-3">
+            <div class="pipeline-icon">📶</div>
+            <div class="pipeline-label">Restored</div>
+          </div>
+          <div class="pipeline-step" id="pipe-step-4">
+            <div class="pipeline-icon">🔄</div>
+            <div class="pipeline-label">Syncing</div>
+          </div>
+          <div class="pipeline-step" id="pipe-step-5">
+            <div class="pipeline-icon">⚖️</div>
+            <div class="pipeline-label">Reconciled</div>
+          </div>
+          <div class="pipeline-step" id="pipe-step-6">
+            <div class="pipeline-icon">✅</div>
+            <div class="pipeline-label">Completed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auto-Sync Engine & Exponential Backoff Failure Handling (Section 13 & 19) -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <span>⚙️ Auto-Sync Engine Execution</span>
+          </div>
+          <p style="color:var(--text-muted); font-size:13px; margin-bottom:14px;">
+            Trigger batch synchronization manually or simulate network failures to test exponential backoff recovery.
+          </p>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <button class="btn btn-primary" onclick="triggerSyncNow()">
+              🚀 Trigger Auto-Sync Now
+            </button>
+            <button class="btn btn-amber" onclick="simulateSyncFailureWithBackoff()">
+              ⚠️ Simulate Sync Failure & Exponential Backoff
+            </button>
+            <button class="btn btn-danger" onclick="simulateHashMismatchInvestigation()">
+              🚨 Simulate Hash Tamper / Mismatch
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>📟 Live Sync Engine Console Output</span>
+            <span class="badge badge-blue">Audit Log</span>
+          </div>
+          <div id="sync-console-output" class="mono" style="background:#090e17; border-radius:10px; padding:12px; height:180px; overflow-y:auto; font-size:11px; line-height:1.6; color:#93c5fd; border:1px solid var(--border);">
+            [SYSTEM] Sync Engine daemon initialized.<br>
+            [STATUS] Monitoring network state transitions (OFFLINE → ONLINE).<br>
+            [READY] 2 transactions currently waiting in local secure vault.<br>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 5: RISK & DUPLICATE PROTECTION ==================== -->
+    <section id="tab-risk" class="tab-content">
+      <div class="grid-2" style="margin-bottom:24px;">
+        <!-- Left: Interactive Risk Engine Calculator (Section 11) -->
+        <div class="card">
+          <div class="card-title">
+            <span>🛡️ Lightweight Risk & Security Engine</span>
+            <span class="badge badge-green">8 Pre-Auth Checks</span>
+          </div>
+          <p style="color:var(--text-muted); font-size:13px; margin-bottom:14px;">
+            Before any transaction is accepted offline into the local vault, DRUNIX Pay evaluates eight trust parameters to prevent fraud, overspending, and double charging:
+          </p>
+
+          <div style="margin-bottom:14px;">
+            <label style="font-size:12px; font-weight:600; color:var(--text-muted); display:flex; justify-content:space-between;">
+              <span>Test Transaction Amount:</span>
+              <strong style="color:#60a5fa;" id="risk-calc-amount-label">₹450</strong>
+            </label>
+            <input type="range" min="50" max="6000" step="50" value="450" style="width:100%; margin-top:6px;" id="risk-calc-amount-slider" oninput="updateRiskCalculator()">
+          </div>
+
+          <div class="grid-2" style="margin-bottom:14px;">
+            <div>
+              <label style="font-size:11px; color:var(--text-muted);">Merchant Reputation</label>
+              <select id="risk-calc-merchant" class="btn btn-secondary btn-block" style="padding:6px 10px; font-size:12px; text-align:left;" onchange="updateRiskCalculator()">
+                <option value="merch_sharma_01">Sharma General Store (Verified)</option>
+                <option value="unregistered_99">Unknown / Unregistered Merchant</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px; color:var(--text-muted);">Device Keystore Trust</label>
+              <select id="risk-calc-device" class="btn btn-secondary btn-block" style="padding:6px 10px; font-size:12px; text-align:left;" onchange="updateRiskCalculator()">
+                <option value="trusted">Hardware KeyStore (96/100)</option>
+                <option value="untrusted">Rooted / Tampered OS (35/100)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Risk Score Result Card -->
+          <div id="risk-score-display-card" style="background:#090e17; border-radius:12px; padding:16px; border:1px solid rgba(16,185,129,0.3); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:11px; color:var(--text-muted); font-weight:600;">EVALUATED RISK SCORE</div>
+              <div style="font-size:28px; font-weight:800; color:#34d399;" id="risk-score-val">12 / 100</div>
+              <div style="font-size:12px; font-weight:700; color:#34d399;" id="risk-level-val">LOW RISK</div>
+            </div>
+            <div style="text-align:right;">
+              <span id="risk-decision-badge" class="badge badge-green" style="font-size:12px; padding:6px 12px;">✓ ALLOW PAYMENT</span>
+              <div id="risk-reason-text" style="font-size:11px; color:var(--text-muted); margin-top:6px; max-width:220px;">
+                Transaction complies with offline limit and device hardware trust.
+              </div>
+            </div>
+          </div>
+
+          <!-- Factor list -->
+          <div style="margin-top:14px;" id="risk-factors-list">
+            <!-- Dynamic factors -->
+          </div>
+        </div>
+
+        <!-- Right: Duplicate Payment Protection Showcase (Section 7) -->
+        <div class="card">
+          <div class="card-title">
+            <span>⚡ Duplicate Payment Protection Innovation</span>
+            <span class="badge badge-amber">Core Hackathon Feature</span>
+          </div>
+          <p style="color:var(--text-muted); font-size:13px; margin-bottom:14px;">
+            In areas with unstable connectivity, customers frequently tap 'Pay' repeatedly fearing the first attempt was dropped. DRUNIX Pay deploys a multi-variable contextual filter to intercept identical payments before double-debiting.
+          </p>
+
+          <div style="background:#090e17; border-radius:12px; padding:16px; border:1px solid var(--border); margin-bottom:14px;">
+            <div style="font-weight:700; font-size:13px; color:#fbbf24; margin-bottom:8px;">
+              ⚠ Simulated Duplicate Detection Scenario
+            </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
+              User completed an offline payment of ₹450 to Sharma General Store. User immediately presses Pay again.
+            </p>
+            <button class="btn btn-amber btn-block" onclick="simulateDuplicateFlow()">
+              Trigger Duplicate Payment Interception Modal
+            </button>
+          </div>
+
+          <div style="background:rgba(2,6,23,0.5); border-radius:10px; padding:12px; border:1px solid var(--border);">
+            <div style="font-size:11px; font-weight:700; color:#93c5fd; margin-bottom:6px;">INTERCEPTION HEURISTICS:</div>
+            <ul style="font-size:12px; color:var(--text-muted); padding-left:18px; line-height:1.5;">
+              <li>Exact Merchant ID match within 180s sliding window</li>
+              <li>Identical transaction amount (₹450)</li>
+              <li>Same physical device hardware fingerprint</li>
+              <li>Existing local record in 'WAITING_FOR_SYNC' state</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Local Transaction Vault & Cryptographic Hashes (Section 9 & 10) -->
+      <div class="card">
+        <div class="card-title">
+          <span>🔒 Secure Local Transaction Vault & Cryptographic Proofs</span>
+          <span class="badge badge-blue">HMAC-SHA256 Nonce Verification</span>
+        </div>
+        <p style="color:var(--text-muted); font-size:13px; margin-bottom:14px;">
+          Transactions stored locally in the hardware keystore contain tamper-evident cryptographic metadata. When connectivity returns, the server recomputes the hash using the shared enclave seed to confirm zero tampering:
+        </p>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Txn ID</th>
+                <th>Merchant</th>
+                <th>Amount</th>
+                <th>Timestamp</th>
+                <th>Nonce</th>
+                <th>Local Digest (HMAC-SHA256)</th>
+                <th>Server Digest</th>
+                <th>Integrity</th>
+              </tr>
+            </thead>
+            <tbody id="vault-records-tbody">
+              <!-- Dynamically populated from /vault/records -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 6: RECONCILIATION & STATE MACHINE ==================== -->
+    <section id="tab-reconcile" class="tab-content">
+      <!-- Visual State Machine (Section 8) -->
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-title">
+          <span>🔄 Visual Transaction State Machine (Section 8)</span>
+          <span class="badge badge-purple">9 Nominal States + 5 Exception Handlers</span>
+        </div>
+        <p style="color:var(--text-muted); font-size:13px; margin-bottom:12px;">
+          The system intelligently manages the entire transaction lifecycle across ONLINE, OFFLINE, and RECONNECTED states:
+        </p>
+
+        <!-- Nominal Path -->
+        <div style="font-size:11px; font-weight:700; color:#93c5fd; text-transform:uppercase; margin-bottom:6px;">
+          Nominal Lifecycle Path:
+        </div>
+        <div class="sm-flow">
+          <div class="sm-node done" id="smn-initiated">INITIATED</div>
+          <span class="sm-arrow">→</span>
+          <div class="sm-node done" id="smn-auth">AUTHENTICATED</div>
+          <span class="sm-arrow">→</span>
+          <div class="sm-node done" id="smn-offline-acc">OFFLINE ACCEPTED</div>
+          <span class="sm-arrow">→</span>
+          <div class="sm-node done" id="smn-queued">LOCALLY QUEUED</div>
+          <span class="sm-arrow">→</span>
+          <div class="sm-node active" id="smn-waiting">WAITING FOR CONNECTIVITY</div>
+          <span class="sm-arrow">→</span>
+          <div class="sm-node" id="smn-syncing">SYNCING</div>
+          <span class="sm-arrow">→</span>
+          <div class="sm-node" id="smn-validation">SERVER VALIDATION</div>
+          <span class="sm-arrow">→</span>
+          <div class="sm-node" id="smn-reconciliation">RECONCILIATION</div>
+          <span class="sm-arrow">→</span>
+          <div class="sm-node" id="smn-settled">SETTLED</div>
+        </div>
+
+        <!-- Exception States -->
+        <div style="font-size:11px; font-weight:700; color:#f87171; text-transform:uppercase; margin-top:14px; margin-bottom:6px;">
+          Handled Exception States:
+        </div>
+        <div class="sm-flow">
+          <div class="sm-node exception" id="smn-dup">DUPLICATE</div>
+          <div class="sm-node exception" id="smn-rej">REJECTED</div>
+          <div class="sm-node exception" id="smn-exp">EXPIRED</div>
+          <div class="sm-node exception" id="smn-retry">REQUIRES_RETRY</div>
+          <div class="sm-node exception" id="smn-disp">DISPUTED</div>
+        </div>
+      </div>
+
+      <!-- Reconciliation Comparison Dashboard (Section 14) -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <div class="card-title" style="margin-bottom:2px;">
+              <span>⚖️ Backend Reconciliation Engine Dashboard</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted);">
+              Automated multi-way comparison: LOCAL TRANSACTION VAULT vs SERVER SWITCH LEDGER
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="runReconciliationAudit()">
+            Run Reconciliation Batch
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Txn ID</th>
+                <th>Merchant</th>
+                <th>Amount</th>
+                <th>Mode</th>
+                <th>Local Status</th>
+                <th>Reconciliation Outcome</th>
+                <th>Local Digest</th>
+                <th>Server Digest</th>
+                <th>Audit Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="reconcile-records-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 7: OBSERVABILITY & METRICS ==================== -->
+    <section id="tab-observability" class="tab-content">
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-title">
+          <span>📊 Admin & Judge Observability Dashboard (Section 17 & 28)</span>
+          <span class="badge badge-amber">Prototype simulation metrics — for demonstration only</span>
+        </div>
+        <div class="grid-4" style="margin-bottom:20px;">
+          <div style="background:#090e17; border-radius:12px; padding:16px; border:1px solid var(--border);">
+            <div style="font-size:11px; color:var(--text-muted); font-weight:600;">TOTAL TRANSACTIONS</div>
+            <div style="font-size:30px; font-weight:800; color:#ffffff;" id="obs-total-txns">12</div>
+            <div style="font-size:11px; color:#38bdf8;">Across all nodes</div>
+          </div>
+          <div style="background:#090e17; border-radius:12px; padding:16px; border:1px solid var(--border);">
+            <div style="font-size:11px; color:var(--text-muted); font-weight:600;">OFFLINE TRANSACTIONS</div>
+            <div style="font-size:30px; font-weight:800; color:#a78bfa;" id="obs-offline-txns">9</div>
+            <div style="font-size:11px; color:#a78bfa;">75% of volume</div>
+          </div>
+          <div style="background:#090e17; border-radius:12px; padding:16px; border:1px solid var(--border);">
+            <div style="font-size:11px; color:var(--text-muted); font-weight:600;">RECONCILED (SETTLED)</div>
+            <div style="font-size:30px; font-weight:800; color:#34d399;" id="obs-settled-txns">8</div>
+            <div style="font-size:11px; color:#34d399;">97% reconciliation rate</div>
+          </div>
+          <div style="background:#090e17; border-radius:12px; padding:16px; border:1px solid var(--border);">
+            <div style="font-size:11px; color:var(--text-muted); font-weight:600;">DUPLICATES INTERCEPTED</div>
+            <div style="font-size:30px; font-weight:800; color:#fb923c;" id="obs-dup-txns">3</div>
+            <div style="font-size:11px; color:#fb923c;">100% prevented double debit</div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid-2">
+          <div style="background:#090e17; border-radius:12px; padding:16px; border:1px solid var(--border);">
+            <div style="font-weight:700; font-size:13px; margin-bottom:12px; color:#93c5fd;">
+              Transactions by Lifecycle Status
+            </div>
+            <canvas id="chart-status" width="400" height="200" style="max-height:200px; width:100%;"></canvas>
+          </div>
+          <div style="background:#090e17; border-radius:12px; padding:16px; border:1px solid var(--border);">
+            <div style="font-weight:700; font-size:13px; margin-bottom:12px; color:#93c5fd;">
+              Hourly Payment Distribution (Offline vs Online)
+            </div>
+            <canvas id="chart-volume" width="400" height="200" style="max-height:200px; width:100%;"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 8: ARCHITECTURE & API EXPLORER ==================== -->
+    <section id="tab-architecture" class="tab-content">
+      <!-- Architecture Visualization (Section 22) -->
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-title">
+          <span>🏛️ DRUNIX Pay Resilience Architecture (Section 22)</span>
+          <span class="badge badge-blue">Dual Path: Online vs Offline</span>
+        </div>
+        <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px;">
+          DRUNIX Pay does not seek to replace national payment switches like NPCI/UPI. Instead, it provides an elastic resilience shim that governs local transaction integrity, duplicate suppression, and automated reconciliation:
+        </p>
+
+        <div style="background:#090e17; border-radius:14px; padding:20px; border:1px solid var(--border); overflow-x:auto;">
+          <div style="display:flex; flex-direction:column; gap:12px; min-width:850px;">
+            <!-- Client Layer -->
+            <div style="display:flex; gap:12px;">
+              <div style="flex:1; background:rgba(37,99,235,0.15); border:1px solid #3b82f6; border-radius:10px; padding:12px; text-align:center;">
+                <div style="font-weight:700; color:#60a5fa; font-size:12px;">CUSTOMER MOBILE APP</div>
+                <div style="font-size:11px; color:var(--text-muted);">Priya Sharma • Android / iOS Client</div>
+              </div>
+              <div style="flex:1; background:rgba(16,185,129,0.15); border:1px solid #10b981; border-radius:10px; padding:12px; text-align:center;">
+                <div style="font-weight:700; color:#34d399; font-size:12px;">MERCHANT POS TERMINAL</div>
+                <div style="font-size:11px; color:var(--text-muted);">Sharma General Store • Soundbox / POS</div>
+              </div>
+            </div>
+
+            <!-- Resilience Bridge Layer -->
+            <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:8px;">
+              <div style="background:#111927; border:1px solid #2563eb; border-radius:8px; padding:10px; text-align:center;">
+                <div style="font-size:11px; font-weight:700; color:#93c5fd;">OFFLINE ENGINE</div>
+                <div style="font-size:10px; color:var(--text-muted);">Tokenization</div>
+              </div>
+              <div style="background:#111927; border:1px solid #8b5cf6; border-radius:8px; padding:10px; text-align:center;">
+                <div style="font-size:11px; font-weight:700; color:#c084fc;">SECURE LOCAL VAULT</div>
+                <div style="font-size:10px; color:var(--text-muted);">HMAC-SHA256</div>
+              </div>
+              <div style="background:#111927; border:1px solid #f59e0b; border-radius:8px; padding:10px; text-align:center;">
+                <div style="font-size:11px; font-weight:700; color:#fcd34d;">DUPLICATE ENGINE</div>
+                <div style="font-size:10px; color:var(--text-muted);">Fuzzy Heuristic</div>
+              </div>
+              <div style="background:#111927; border:1px solid #10b981; border-radius:8px; padding:10px; text-align:center;">
+                <div style="font-size:11px; font-weight:700; color:#6ee7b7;">SYNC ENGINE</div>
+                <div style="font-size:10px; color:var(--text-muted);">Exponential Backoff</div>
+              </div>
+              <div style="background:#111927; border:1px solid #ef4444; border-radius:8px; padding:10px; text-align:center;">
+                <div style="font-size:11px; font-weight:700; color:#fca5a5;">RISK ENGINE</div>
+                <div style="font-size:10px; color:var(--text-muted);">8 Pre-Auth Checks</div>
+              </div>
+            </div>
+
+            <!-- Server & Gateway Layer -->
+            <div style="display:flex; gap:12px;">
+              <div style="flex:1; background:rgba(30, 41, 59, 0.7); border:1px solid #475569; border-radius:10px; padding:12px; text-align:center;">
+                <div style="font-weight:700; color:#f8fafc; font-size:12px;">DRUNIX CLOUD API GATEWAY</div>
+                <div style="font-size:11px; color:var(--text-muted);">FastAPI • JWT Device Attestation • Batch Ingestion</div>
+              </div>
+              <div style="flex:1; background:rgba(30, 41, 59, 0.7); border:1px solid #475569; border-radius:10px; padding:12px; text-align:center;">
+                <div style="font-weight:700; color:#f8fafc; font-size:12px;">RECONCILIATION ENGINE</div>
+                <div style="font-size:11px; color:var(--text-muted);">Local Vault Ledger vs Server Ledger Matching</div>
+              </div>
+              <div style="flex:1; background:rgba(0, 59, 112, 0.5); border:1px solid #003b70; border-radius:10px; padding:12px; text-align:center;">
+                <div style="font-weight:700; color:#93c5fd; font-size:12px;">MOCK BANKING & UPI SWITCH</div>
+                <div style="font-size:10px; color:var(--text-muted);">Citi / NPCI Simulated Core Switch</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive API Demonstration (Section 24) -->
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-title">
+          <span>🛠️ Interactive API Demonstration (Section 24)</span>
+          <span class="badge badge-green">Click to execute live requests</span>
+        </div>
+        <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px;">
+          All prototype APIs are active. Click any endpoint below to inspect the live HTTP request, status code, and JSON response:
+        </p>
+
+        <div class="grid-2">
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <button class="btn btn-secondary" style="text-align:left; justify-content:start;" onclick="runApiTest('GET', '/connectivity/status', null)">
+              <span class="badge badge-green">GET</span> <span class="mono">/connectivity/status</span>
+            </button>
+            <button class="btn btn-secondary" style="text-align:left; justify-content:start;" onclick="runApiTest('POST', '/risk/evaluate', {merchant_id:'merch_sharma_01', amount:450, customer_id:'cust_priya_01', is_offline:true})">
+              <span class="badge badge-blue">POST</span> <span class="mono">/risk/evaluate</span>
+            </button>
+            <button class="btn btn-secondary" style="text-align:left; justify-content:start;" onclick="runApiTest('POST', '/payment/offline', {merchant_id:'merch_sharma_01', amount:450, customer_id:'cust_priya_01'})">
+              <span class="badge badge-blue">POST</span> <span class="mono">/payment/offline</span>
+            </button>
+            <button class="btn btn-secondary" style="text-align:left; justify-content:start;" onclick="runApiTest('GET', '/payment/DRX-2026-001284', null)">
+              <span class="badge badge-green">GET</span> <span class="mono">/payment/DRX-2026-001284</span>
+            </button>
+            <button class="btn btn-secondary" style="text-align:left; justify-content:start;" onclick="runApiTest('POST', '/sync', {})">
+              <span class="badge badge-blue">POST</span> <span class="mono">/sync</span>
+            </button>
+            <button class="btn btn-secondary" style="text-align:left; justify-content:start;" onclick="runApiTest('POST', '/reconcile', {})">
+              <span class="badge badge-blue">POST</span> <span class="mono">/reconcile</span>
+            </button>
+            <button class="btn btn-secondary" style="text-align:left; justify-content:start;" onclick="runApiTest('GET', '/merchant/dashboard', null)">
+              <span class="badge badge-green">GET</span> <span class="mono">/merchant/dashboard</span>
+            </button>
+            <button class="btn btn-secondary" style="text-align:left; justify-content:start;" onclick="runApiTest('GET', '/transactions', null)">
+              <span class="badge badge-green">GET</span> <span class="mono">/transactions</span>
+            </button>
+          </div>
+
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:12px; font-weight:700; color:var(--text-muted);">API Response Console:</span>
+              <span id="api-status-badge" class="badge badge-blue">HTTP 200 OK</span>
+            </div>
+            <pre id="api-response-pre" class="mono" style="background:#090e17; border:1px solid var(--border); border-radius:10px; padding:12px; height:280px; overflow-y:auto; font-size:11px; color:#38bdf8; line-height:1.5;">
+Select any endpoint on the left to fire a live test call.
+            </pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Database Schemas (Section 25) -->
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-title">
+          <span>🗄️ Relational Database Schema Model (Section 25)</span>
+          <span class="badge badge-blue">SQLite / PostgreSQL Equivalent</span>
+        </div>
+        <div class="grid-3" style="font-size:11px;">
+          <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+            <div style="font-weight:700; color:#60a5fa; margin-bottom:4px;">USERS</div>
+            <div class="mono" style="color:var(--text-muted);">id, name, upi_id, offline_balance, max_offline_limit, device_id, device_trust_score</div>
+          </div>
+          <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+            <div style="font-weight:700; color:#34d399; margin-bottom:4px;">MERCHANTS</div>
+            <div class="mono" style="color:var(--text-muted);">id, name, upi_id, category, verified, terminal_id, today_total_sales, today_offline_sales</div>
+          </div>
+          <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+            <div style="font-weight:700; color:#fbbf24; margin-bottom:4px;">TRANSACTIONS</div>
+            <div class="mono" style="color:var(--text-muted);">txn_id, customer_id, merchant_id, amount, mode, status, nonce, local_hash, server_hash</div>
+          </div>
+          <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+            <div style="font-weight:700; color:#a78bfa; margin-bottom:4px;">OFFLINE_WALLET</div>
+            <div class="mono" style="color:var(--text-muted);">local_balance, reserved_balance, daily_cap, transactions_today, key_rotation_epoch</div>
+          </div>
+          <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+            <div style="font-weight:700; color:#f87171; margin-bottom:4px;">SYNC_QUEUE</div>
+            <div class="mono" style="color:var(--text-muted);">id, txn_id, status, retry_count, last_attempt, error_message, backoff_ms</div>
+          </div>
+          <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+            <div style="font-weight:700; color:#38bdf8; margin-bottom:4px;">RECONCILIATION_LOG</div>
+            <div class="mono" style="color:var(--text-muted);">id, txn_id, status (MATCH, MISMATCH, DUPLICATE), notes, timestamp</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regulatory Positioning (Section 29) -->
+      <div class="card" style="border-left:4px solid #f59e0b;">
+        <div style="font-weight:700; font-size:13px; color:#fbbf24; margin-bottom:6px;">
+          ⚖️ Regulatory & Production Positioning Statement (Section 29)
+        </div>
+        <p style="font-size:12px; color:var(--text-muted); line-height:1.6;">
+          This prototype demonstrates a simulated resilience layer for low-connectivity payments. Actual deployment would require integration with authorized payment system participants, applicable RBI/NPCI requirements, security certification, transaction limits, authentication requirements, and production-grade reconciliation.
+          <br><br>
+          <em>Built on the DRUNIX Platform in collaboration with Citi for the DRUNIX Hackathon. Does not process real UPI transactions.</em>
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Modal 1: Payment Confirmation Modal (Step 2) -->
+  <div id="modal-confirm-pay" class="modal-backdrop">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('modal-confirm-pay')">✕</button>
+      <div style="text-align:center; margin-bottom:16px;">
+        <div style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Payment Confirmation</div>
+        <div style="font-size:24px; font-weight:800; color:#ffffff; margin:4px 0;">
+          Pay ₹<span id="confirm-amount">450</span>?
+        </div>
+        <div style="font-size:14px; font-weight:600; color:#93c5fd;" id="confirm-merchant-name">Sharma General Store</div>
+      </div>
+
+      <div style="background:#090e17; border-radius:12px; padding:14px; border:1px solid var(--border); margin-bottom:16px; font-size:12px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+          <span style="color:var(--text-muted);">Payment Mode:</span>
+          <strong id="confirm-payment-mode" style="color:#fcd34d;">OFFLINE</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+          <span style="color:var(--text-muted);">Available Offline Balance:</span>
+          <strong id="confirm-avail-balance">₹1,850</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+          <span style="color:var(--text-muted);">Remaining Balance:</span>
+          <strong id="confirm-rem-balance" style="color:#34d399;">₹1,400</strong>
+        </div>
+        <div style="border-top:1px solid var(--border); padding-top:8px; margin-top:8px;">
+          <div style="color:var(--text-muted); margin-bottom:6px; font-weight:600;">Security Pre-Verification:</div>
+          <div style="color:#34d399; display:flex; flex-direction:column; gap:3px;">
+            <span>✓ Device verified (Hardware KeyStore Attestation)</span>
+            <span>✓ Merchant verified (Sharma General Store POS-01)</span>
+            <span>✓ Transaction within offline limit (≤ ₹2,000)</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('modal-confirm-pay')">Cancel</button>
+        <button class="btn btn-primary" style="flex:2;" onclick="executeConfirmedPayment()">CONFIRM PAYMENT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Offline Payment Recorded Success Modal (Step 3 & Section 6) -->
+  <div id="modal-success-pay" class="modal-backdrop">
+    <div class="modal-box" style="text-align:center;">
+      <button class="modal-close" onclick="closeModal('modal-success-pay')">✕</button>
+      <div style="width:56px; height:56px; border-radius:50%; background:rgba(16,185,129,0.2); border:2px solid #10b981; display:flex; align-items:center; justify-content:center; font-size:28px; margin:0 auto 12px; color:#34d399;">
+        ✓
+      </div>
+      <h3 style="font-size:20px; font-weight:800; color:#f8fafc; margin-bottom:4px;">Payment Securely Recorded</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:16px;">
+        Stored in encrypted local hardware vault with tamper-evident cryptographic hash.
+      </p>
+
+      <div style="background:#090e17; border-radius:12px; padding:14px; text-align:left; border:1px solid var(--border); margin-bottom:16px; font-size:12px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+          <span style="color:var(--text-muted);">Transaction ID:</span>
+          <strong class="mono" style="color:#60a5fa;" id="success-txn-id">DRX-2026-001284</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+          <span style="color:var(--text-muted);">Amount:</span>
+          <strong style="font-size:15px; color:#ffffff;">₹<span id="success-amount">450</span></strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+          <span style="color:var(--text-muted);">Merchant:</span>
+          <span id="success-merchant">Sharma General Store</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+          <span style="color:var(--text-muted);">Status:</span>
+          <span class="badge badge-amber" id="success-status">WAITING FOR SYNC</span>
+        </div>
+        <div style="margin-top:8px; border-top:1px solid var(--border); pt:8px;">
+          <span style="color:var(--text-muted); font-size:11px;">Cryptographic Integrity Hash:</span>
+          <div class="hash-token-box" style="margin-top:4px;" id="success-hash">8f3a92bd41e...</div>
+        </div>
+      </div>
+
+      <div style="background:rgba(245, 158, 11, 0.1); border-radius:8px; padding:10px; font-size:11px; color:#fbbf24; margin-bottom:16px;">
+        ℹ️ Final network-side settlement occurs after synchronization when connectivity returns.
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="openDigitalReceiptModal()">View Receipt</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="closeModal('modal-success-pay')">Back to Home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Duplicate Payment Warning Modal (Section 7) -->
+  <div id="modal-duplicate-warning" class="modal-backdrop">
+    <div class="modal-box" style="border:2px solid #f59e0b;">
+      <button class="modal-close" onclick="closeModal('modal-duplicate-warning')">✕</button>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <div style="font-size:32px;">⚠️</div>
+        <div>
+          <h3 style="font-size:18px; font-weight:800; color:#fbbf24;">POSSIBLE DUPLICATE PAYMENT</h3>
+          <div style="font-size:12px; color:var(--text-muted);">Multi-factor duplicate prevention alert</div>
+        </div>
+      </div>
+
+      <p style="font-size:13px; color:#f8fafc; margin-bottom:14px; line-height:1.4;">
+        We found a recent offline payment with the same merchant and amount:
+      </p>
+
+      <div style="background:#090e17; border-radius:12px; padding:14px; border:1px solid rgba(245,158,11,0.4); margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <strong style="font-size:16px; color:#ffffff;">₹450</strong>
+          <span class="badge badge-amber">Waiting for Sync</span>
+        </div>
+        <div style="font-size:13px; font-weight:600; color:#93c5fd;">Sharma General Store</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+          Initiated 2 minutes ago • Device DEV-SM-A54
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="viewExistingPaymentFromDuplicate()">
+          VIEW EXISTING PAYMENT
+        </button>
+        <button class="btn btn-danger" style="flex:1;" onclick="continueDuplicateAnyway()">
+          CONTINUE ANYWAY
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Merchant Digital Receipt Modal (Section 16) -->
+  <div id="modal-digital-receipt" class="modal-backdrop">
+    <div class="modal-box" style="max-width:400px; text-align:center;">
+      <button class="modal-close" onclick="closeModal('modal-digital-receipt')">✕</button>
+      <div style="border-bottom:2px dashed var(--border); padding-bottom:16px; margin-bottom:16px;">
+        <div style="font-size:11px; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:1px;">OFFLINE PAYMENT RECEIPT</div>
+        <h3 style="font-size:22px; font-weight:800; color:#ffffff; margin:4px 0;">PAYMENT RECEIVED</h3>
+        <div style="font-size:32px; font-weight:800; color:#34d399; margin:6px 0;">₹<span id="receipt-amount">450</span></div>
+        <div style="font-size:14px; font-weight:700; color:#f8fafc;" id="receipt-merchant">Sharma General Store</div>
+        <div class="mono" style="font-size:11px; color:var(--text-muted);">POS Terminal: POS-SHARMA-01</div>
+      </div>
+
+      <div style="font-size:12px; text-align:left; line-height:1.8; margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--text-muted);">Transaction ID:</span>
+          <strong class="mono" id="receipt-txn-id">DRX-2026-001284</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--text-muted);">Mode:</span>
+          <span class="badge badge-amber" id="receipt-mode">OFFLINE</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--text-muted);">Status:</span>
+          <span id="receipt-status" style="color:#fbbf24; font-weight:600;">Recorded — awaiting synchronization</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--text-muted);">Time:</span>
+          <span id="receipt-time">Today, Just now</span>
+        </div>
+      </div>
+
+      <!-- Simulated QR code for token exchange -->
+      <div style="background:#ffffff; border-radius:10px; padding:12px; display:inline-block; margin-bottom:12px;">
+        <div style="font-size:9px; color:#000000; font-family:monospace; line-height:1.1; letter-spacing:1px;">
+          ⬛⬜⬛⬛⬛⬜⬛<br>
+          ⬛⬜⬛⬜⬛⬜⬛<br>
+          ⬛⬛⬛⬛⬛⬛⬛<br>
+          ⬜⬜⬛⬜⬛⬜⬜<br>
+          ⬛⬛⬛⬜⬛⬛⬛<br>
+          DRX-PROOF-OK
+        </div>
+      </div>
+      <div class="mono" style="font-size:10px; color:var(--text-dim);" id="receipt-hash-short">
+        HASH: 8f3a...92bd
+      </div>
+
+      <button class="btn btn-secondary btn-block" style="margin-top:14px;" onclick="closeModal('modal-digital-receipt')">
+        Close Receipt
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== FLOATING DEMO CONTROL PANEL FOR JUDGES (Section 18) ==================== -->
+  <div id="judge-floating-panel" class="judge-floating-panel">
+    <div class="judge-panel-header" onclick="toggleJudgePanel()">
+      <div class="judge-panel-title">
+        <span>⚡ JUDGE SIMULATION CONTROL PANEL</span>
+      </div>
+      <div style="font-size:12px; color:var(--text-muted);" id="judge-toggle-btn">▼ Min</div>
+    </div>
+    <div class="judge-grid-buttons" id="judge-buttons-grid">
+      <button class="btn-judge" onclick="executeDemoAction('internet_loss')">
+        <span>🔴</span> Simulate Internet Loss
+      </button>
+      <button class="btn-judge" onclick="executeDemoAction('internet_restore')">
+        <span>🟢</span> Restore Internet
+      </button>
+      <button class="btn-judge" onclick="executeDemoAction('simulate_duplicate')">
+        <span>⚠️</span> Simulate Duplicate Pay
+      </button>
+      <button class="btn-judge" onclick="executeDemoAction('simulate_sync_failure')">
+        <span>🔄</span> Simulate Sync Failure
+      </button>
+      <button class="btn-judge" onclick="executeDemoAction('simulate_timeout')">
+        <span>⏱️</span> Simulate Server Timeout
+      </button>
+      <button class="btn-judge" onclick="executeDemoAction('simulate_hash_mismatch')">
+        <span>🚨</span> Simulate Hash Mismatch
+      </button>
+      <button class="btn-judge" onclick="executeDemoAction('simulate_successful_reconcile')">
+        <span>⚖️</span> Successful Reconcile
+      </button>
+      <button class="btn-judge" onclick="executeDemoAction('reset_demo')">
+        <span>🔄</span> Reset Demo State
+      </button>
+    </div>
+  </div>
+
+  <!-- Audio Context Chime Script -->
+  <script>
+    function playBeep(success = true) {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        if (success) {
+          osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+          osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.08); // A5
+          gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.35);
+        } else {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.3);
+        }
+      } catch (e) {
+        // AudioContext not allowed without user gesture
+      }
+    }
+  </script>
+
+  <!-- Main JavaScript App Logic -->
+  <script>
+    
+    // ==========================================
+    // HYBRID BACKEND BRIDGE & CLIENT SIMULATION
+    // Ensures 100% full interactivity both when running with FastAPI
+    // and when opened standalone as a static file in any browser!
+    // ==========================================
+    const ClientStore = {
+      user: {
+        id: "cust_priya_01",
+        name: "Priya Sharma",
+        upi_id: "priya@okaxis",
+        offline_balance: 1850.00,
+        max_offline_limit: 5000.00,
+        device_id: "DEV-SM-A54-SECURE-9821",
+        device_trust_score: 96
+      },
+      merchant: {
+        id: "merch_sharma_01",
+        name: "Sharma General Store",
+        upi_id: "sharma@demo",
+        category: "Groceries & Daily Essentials",
+        verified: 1,
+        terminal_id: "POS-SHARMA-01",
+        today_total_sales: 24850.0,
+        today_offline_sales: 8450.0,
+        pending_sync_count: 3,
+        successful_count: 47,
+        exceptions_count: 1,
+        duplicate_attempts: 2
+      },
+      connectivity: {
+        state: "ONLINE",
+        latency_ms: 42,
+        packet_loss_pct: 0,
+        signal_strength: "Strong (4G/5G VoLTE)",
+        recommendation: "Optimal network conditions. Real-time online routing active."
+      },
+      transactions: [
+        { txn_id: "DRX-2026-001275", customer_id: "cust_priya_01", merchant_id: "merch_verma_03", merchant_name: "Verma Dairy & Farm Fresh", amount: 140.0, mode: "OFFLINE", status: "SETTLED", created_at: "08:15 AM", local_hash: "a4f89d31b2c4e5f6...", server_hash: "a4f89d31b2c4e5f6...", reconciliation_status: "MATCH", nonce: "3f82a19b0c4d" },
+        { txn_id: "DRX-2026-001276", customer_id: "cust_priya_01", merchant_id: "merch_sharma_01", merchant_name: "Sharma General Store", amount: 320.0, mode: "OFFLINE", status: "SETTLED", created_at: "09:30 AM", local_hash: "e7b12c8491f034ad...", server_hash: "e7b12c8491f034ad...", reconciliation_status: "MATCH", nonce: "71c08a9d2e4f" },
+        { txn_id: "DRX-2026-001277", customer_id: "cust_priya_01", merchant_id: "merch_metro_04", merchant_name: "Metro Underground Cafe", amount: 85.0, mode: "OFFLINE", status: "SETTLED", created_at: "10:05 AM", local_hash: "99fa1b203c4d5e6f...", server_hash: "99fa1b203c4d5e6f...", reconciliation_status: "MATCH", nonce: "9b4c2e817a0f" },
+        { txn_id: "DRX-2026-001278", customer_id: "cust_priya_01", merchant_id: "merch_patel_02", merchant_name: "Patel Medical & General", amount: 250.0, mode: "OFFLINE", status: "SETTLED", created_at: "11:20 AM", local_hash: "88ab12cd34ef5678...", server_hash: "88ab12cd34ef5678...", reconciliation_status: "MATCH", nonce: "1c2d3e4f5a6b" },
+        { txn_id: "DRX-2026-001279", customer_id: "cust_priya_01", merchant_id: "merch_sharma_01", merchant_name: "Sharma General Store", amount: 510.0, mode: "OFFLINE", status: "SETTLED", created_at: "12:45 PM", local_hash: "1234abcd5678ef90...", server_hash: "1234abcd5678ef90...", reconciliation_status: "MATCH", nonce: "4a5b6c7d8e9f" },
+        { txn_id: "DRX-2026-001280", customer_id: "cust_priya_01", merchant_id: "merch_patel_02", merchant_name: "Patel Medical & General", amount: 180.0, mode: "OFFLINE", status: "WAITING_FOR_SYNC", created_at: "02:10 PM", local_hash: "5566778899aabbcc...", server_hash: null, reconciliation_status: "PENDING", nonce: "e1f2a3b4c5d6" },
+        { txn_id: "DRX-2026-001281", customer_id: "cust_priya_01", merchant_id: "merch_metro_04", merchant_name: "Metro Underground Cafe", amount: 120.0, mode: "OFFLINE", status: "WAITING_FOR_SYNC", created_at: "02:35 PM", local_hash: "aabbccddeeff0011...", server_hash: null, reconciliation_status: "PENDING", nonce: "f9e8d7c6b5a4" }
+      ]
+    };
+
+    async function apiFetch(url, options = {}) {
+      try {
+        const response = await window.fetch(url, options);
+        if (response.ok || response.status === 409 || response.status === 400) {
+          return response;
+        }
+      } catch (err) {
+        // Fallback to client-side in-memory mock engine!
+      }
+      return handleClientSimulation(url, options);
+    }
+
+    function handleClientSimulation(url, options = {}) {
+      const method = (options.method || 'GET').toUpperCase();
+      let body = {};
+      try { if (options.body) body = JSON.parse(options.body); } catch (e) {}
+
+      let status = 200;
+      let data = {};
+
+      if (url === '/connectivity/status') {
+        data = { ...ClientStore.connectivity };
+      } else if (url === '/connectivity/set') {
+        const state = (body.state || 'ONLINE').toUpperCase();
+        if (state === 'OFFLINE') {
+          ClientStore.connectivity = { state: 'OFFLINE', latency_ms: 9999, packet_loss_pct: 100, signal_strength: 'No Signal / Disconnected (0 bars)', recommendation: 'Offline Resilient Mode Active. Local vault storage enabled.' };
+        } else if (state === 'LIMITED') {
+          ClientStore.connectivity = { state: 'LIMITED', latency_ms: body.latency_ms || 780, packet_loss_pct: body.packet_loss_pct || 34, signal_strength: 'Poor (1-2 bars 2G/EDGE)', recommendation: 'Network Quality Poor (Latency 780ms, 34% Packet Loss). Switching to resilient payment mode.' };
+        } else {
+          ClientStore.connectivity = { state: 'ONLINE', latency_ms: 42, packet_loss_pct: 0, signal_strength: 'Strong (4G/5G VoLTE)', recommendation: 'Optimal network conditions. Real-time online routing active.' };
+        }
+        data = { ...ClientStore.connectivity, auto_sync_triggered: state === 'ONLINE' };
+      } else if (url === '/risk/evaluate') {
+        const amount = body.amount || 450;
+        const isBypass = body.bypass_duplicate || false;
+        const isDup = !isBypass && ClientStore.transactions.some(t => t.merchant_id === body.merchant_id && t.amount === amount && (t.status === 'WAITING_FOR_SYNC' || t.txn_id === 'DRX-2026-001284'));
+        
+        if (isDup) {
+          data = {
+            risk_score: 92, risk_level: "HIGH RISK", allowed: false, reason: "Possible duplicate offline transaction detected.",
+            is_duplicate_threat: true,
+            duplicate_info: { txn_id: "DRX-2026-001284", amount: 450, merchant_name: "Sharma General Store", created_at: "2 minutes ago", status: "Waiting for Sync" },
+            factors: [
+              { name: "Device Trust & Hardware Attestation", status: "PASS", detail: "Secure Enclave Verified (96/100)" },
+              { name: "Merchant Verification", status: "PASS", detail: "Sharma General Store (Verified)" },
+              { name: "Duplicate Detection", status: "FAIL", detail: "Identical payment of ₹450 to Sharma General Store detected in queue" }
+            ]
+          };
+        } else if (amount > 5000) {
+          data = {
+            risk_score: 91, risk_level: "HIGH RISK", allowed: false, reason: "Amount exceeds maximum offline limit of ₹5,000.",
+            factors: [{ name: "Transaction Value", status: "FAIL", detail: "Exceeds regulatory offline cap (₹5,000)" }]
+          };
+        } else if (amount > ClientStore.user.offline_balance) {
+          data = {
+            risk_score: 95, risk_level: "HIGH RISK", allowed: false, reason: "Amount exceeds available offline balance.",
+            factors: [{ name: "Available Offline Balance", status: "FAIL", detail: "Insufficient offline reserve" }]
+          };
+        } else {
+          data = {
+            risk_score: 12, risk_level: "LOW RISK", allowed: true, reason: "All security and offline eligibility criteria satisfied.",
+            factors: [
+              { name: "Device Trust & Hardware Attestation", status: "PASS", detail: "Secure Enclave Verified (96/100)" },
+              { name: "Merchant Verification", status: "PASS", detail: "Sharma General Store (Verified)" },
+              { name: "Transaction Value", status: "PASS", detail: `₹${amount} (Within offline tier ≤ ₹2,000)` },
+              { name: "Available Offline Balance", status: "PASS", detail: `₹${ClientStore.user.offline_balance} available` },
+              { name: "Duplicate Detection", status: "PASS", detail: "Unique transaction parameters verified" }
+            ]
+          };
+        }
+      } else if (url === '/payment/offline' || url === '/payment/initiate') {
+        const amount = body.amount || 450;
+        const bypass = body.bypass_duplicate_check || false;
+        const isDup = !bypass && ClientStore.transactions.some(t => t.merchant_id === body.merchant_id && t.amount === amount && t.status === 'WAITING_FOR_SYNC');
+        
+        if (isDup) {
+          status = 409;
+          data = {
+            error: "POSSIBLE_DUPLICATE_PAYMENT",
+            message: "We found a recent offline payment with the same merchant and amount.",
+            existing_transaction: { txn_id: "DRX-2026-001284", amount: 450, merchant_name: "Sharma General Store", time_ago: "2 minutes ago", status: "Waiting for Sync" }
+          };
+        } else {
+          const txnId = (amount === 450 && body.merchant_id === 'merch_sharma_01') ? "DRX-2026-001284" : `DRX-2026-${Math.floor(100000 + Math.random() * 900000)}`;
+          ClientStore.user.offline_balance -= amount;
+          const newTxn = {
+            txn_id: txnId, customer_id: "cust_priya_01", merchant_id: body.merchant_id || "merch_sharma_01",
+            merchant_name: body.merchant_id === 'merch_patel_02' ? 'Patel Medical & General' : body.merchant_id === 'merch_metro_04' ? 'Metro Underground Cafe' : 'Sharma General Store',
+            amount: amount, mode: ClientStore.connectivity.state, status: ClientStore.connectivity.state === 'ONLINE' ? 'SETTLED' : 'WAITING_FOR_SYNC',
+            created_at: "Just now", local_hash: "8f3a92bd41e06927c3d9b1a504ef329182390123847291038472910293847592",
+            server_hash: ClientStore.connectivity.state === 'ONLINE' ? "8f3a92bd41e06927c3d9b1a504ef329182390123847291038472910293847592" : null,
+            reconciliation_status: ClientStore.connectivity.state === 'ONLINE' ? 'MATCH' : 'PENDING', nonce: "8fa19b0c4d2e"
+          };
+          ClientStore.transactions.unshift(newTxn);
+          ClientStore.merchant.today_offline_sales += amount;
+          ClientStore.merchant.pending_sync_count += 1;
+          
+          data = {
+            status: newTxn.status, transaction_id: txnId, amount: amount, merchant: newTxn.merchant_name,
+            timestamp: "Just now", nonce: newTxn.nonce, integrity_hash: newTxn.local_hash, short_hash: "8f3a...92bd",
+            available_offline_balance: ClientStore.user.offline_balance, message: "Payment securely recorded"
+          };
+        }
+      } else if (url === '/merchant/dashboard') {
+        data = {
+          merchant_id: ClientStore.merchant.id, merchant_name: ClientStore.merchant.name, upi_id: ClientStore.merchant.upi_id,
+          todays_sales: ClientStore.merchant.today_total_sales, offline_sales: ClientStore.merchant.today_offline_sales,
+          pending_sync: ClientStore.transactions.filter(t => t.status === 'WAITING_FOR_SYNC').length,
+          successful: ClientStore.transactions.filter(t => t.status === 'SETTLED').length,
+          exceptions: ClientStore.merchant.exceptions_count, duplicate_attempts: ClientStore.merchant.duplicate_attempts,
+          transactions: ClientStore.transactions
+        };
+      } else if (url === '/sync') {
+        if (body.simulate_failure) {
+          data = { synced_count: 2, successful: 0, requires_review: 2, exponential_backoff_active: true };
+        } else {
+          ClientStore.transactions.forEach(t => {
+            if (t.status === 'WAITING_FOR_SYNC') {
+              t.status = 'SETTLED';
+              t.server_hash = t.local_hash;
+              t.reconciliation_status = 'MATCH';
+              ClientStore.merchant.today_total_sales += t.amount;
+              ClientStore.merchant.pending_sync_count = Math.max(0, ClientStore.merchant.pending_sync_count - 1);
+              ClientStore.merchant.successful_count += 1;
+            }
+          });
+          data = { synced_count: 2, successful: 2, requires_review: 0 };
+        }
+      } else if (url === '/reconcile') {
+        data = {
+          status: "RECONCILIATION_RUN_COMPLETE",
+          records: ClientStore.transactions.map(t => ({
+            txn_id: t.txn_id, merchant_name: t.merchant_name, amount: t.amount, mode: t.mode,
+            local_status: t.status, reconciliation_outcome: t.reconciliation_status,
+            local_hash: t.local_hash ? t.local_hash.substring(0, 4) + '...' + t.local_hash.slice(-4) : 'N/A',
+            server_hash: t.server_hash ? t.server_hash.substring(0, 4) + '...' + t.server_hash.slice(-4) : 'PENDING',
+            time: t.created_at
+          }))
+        };
+      } else if (url === '/vault/records') {
+        data = {
+          vault_title: "LOCAL TRANSACTION VAULT",
+          encrypted_records_count: ClientStore.transactions.length,
+          integrity_check: "✓ PASS",
+          records: ClientStore.transactions.map(t => ({
+            txn_id: t.txn_id, merchant_name: t.merchant_name, amount: t.amount, timestamp: t.created_at,
+            nonce: t.nonce, short_hash: t.local_hash ? t.local_hash.substring(0, 4) + '...' + t.local_hash.slice(-4) : 'N/A',
+            status: t.status, integrity_check: "PASS"
+          }))
+        };
+      } else if (url === '/metrics/observability') {
+        data = {
+          totals: {
+            total_transactions: ClientStore.transactions.length,
+            offline_transactions: ClientStore.transactions.filter(t => t.mode === 'OFFLINE').length,
+            reconciled_transactions: ClientStore.transactions.filter(t => t.status === 'SETTLED').length,
+            duplicate_attempts: 3
+          },
+          charts: {
+            by_status: [
+              { name: "Settled", value: ClientStore.transactions.filter(t => t.status === 'SETTLED').length, color: "#10b981" },
+              { name: "Waiting for Sync", value: ClientStore.transactions.filter(t => t.status === 'WAITING_FOR_SYNC').length, color: "#f59e0b" },
+              { name: "Exceptions", value: 1, color: "#ef4444" }
+            ],
+            volume_by_hour: [
+              { time: "08:00 AM", offline: 1, online: 0 },
+              { time: "09:00 AM", offline: 2, online: 1 },
+              { time: "10:00 AM", offline: 2, online: 3 },
+              { time: "11:00 AM", offline: 3, online: 2 },
+              { time: "12:00 PM", offline: 4, online: 5 },
+              { time: "01:00 PM", offline: 3, online: 4 },
+              { time: "02:00 PM", offline: 2, online: 2 }
+            ]
+          }
+        };
+      } else if (url === '/demo/action') {
+        const action = body.action || '';
+        if (action === 'internet_loss') {
+          ClientStore.connectivity.state = 'OFFLINE';
+          data = { action, status: 'OFFLINE' };
+        } else if (action === 'internet_restore') {
+          ClientStore.connectivity.state = 'ONLINE';
+          data = { action, status: 'ONLINE' };
+        } else if (action === 'simulate_hash_mismatch') {
+          data = { action, tampered_txn_id: 'DRX-2026-001299-TAMPER' };
+        } else {
+          data = { action, status: 'OK' };
+        }
+      } else {
+        data = { status: 'OK' };
+      }
+
+      return {
+        ok: status === 200,
+        status: status,
+        json: async () => data
+      };
+    }
+
+let currentNetworkState = "ONLINE";
+    let pendingPaymentParams = { merchantId: 'merch_sharma_01', amount: 450 };
+    let currentSceneIdx = 1;
+    let lastRecordedTxn = null;
+
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      
+      const target = document.getElementById(tabId);
+      if (target) target.classList.add('active');
+      
+      const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick')?.includes(tabId));
+      if (btn) btn.classList.add('active');
+
+      if (tabId === 'tab-merchant') loadMerchantDashboard();
+      if (tabId === 'tab-risk') { loadVaultRecords(); updateRiskCalculator(); }
+      if (tabId === 'tab-reconcile') runReconciliationAudit();
+      if (tabId === 'tab-observability') loadObservabilityCharts();
+    }
+
+    // Modal helpers
+    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    // Floating Panel
+    function toggleJudgePanel() {
+      const panel = document.getElementById('judge-floating-panel');
+      panel.classList.toggle('minimized');
+      document.getElementById('judge-toggle-btn').innerText = panel.classList.contains('minimized') ? '▲ Open' : '▼ Min';
+    }
+    function openJudgePanel() {
+      const panel = document.getElementById('judge-floating-panel');
+      panel.classList.remove('minimized');
+      document.getElementById('judge-toggle-btn').innerText = '▼ Min';
+    }
+
+    // Lifecycle Pipeline visualizer
+    function setPipelineStep(stepIdx) {
+      const steps = ['pipe-step-1', 'pipe-step-2', 'pipe-step-3', 'pipe-step-4', 'pipe-step-5', 'pipe-step-6'];
+      const bar = document.getElementById('lifecycle-progress-bar');
+      const pct = Math.min(100, Math.max(0, ((stepIdx - 1) / (steps.length - 1)) * 100));
+      if (bar) bar.style.width = pct + '%';
+
+      steps.forEach((id, idx) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('active', 'completed');
+        if (idx + 1 < stepIdx) el.classList.add('completed');
+        else if (idx + 1 === stepIdx) el.classList.add('active');
+      });
+    }
+
+    // Network State Switcher
+    async function setNetworkState(state) {
+      try {
+        const res = await apiFetch('/connectivity/set', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ state })
+        });
+        const data = await res.json();
+        updateNetworkUI(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function cycleConnectivity() {
+      if (currentNetworkState === "ONLINE") setNetworkState("LIMITED");
+      else if (currentNetworkState === "LIMITED") setNetworkState("OFFLINE");
+      else setNetworkState("ONLINE");
+    }
+
+    function updateNetworkUI(data) {
+      currentNetworkState = data.state;
+      const pill = document.getElementById('global-status-pill');
+      const text = document.getElementById('global-status-text');
+      const ping = document.getElementById('global-ping-text');
+      const phoneBadge = document.getElementById('phone-connectivity-badge');
+      const offlineCallout = document.getElementById('offline-mode-callout');
+      const phoneNetText = document.getElementById('phone-network-text');
+
+      pill.className = 'status-pill ' + data.state.toLowerCase();
+      
+      if (data.state === 'ONLINE') {
+        text.innerText = '🟢 ONLINE';
+        ping.innerText = (data.latency_ms || 42) + 'ms';
+        phoneBadge.className = 'badge badge-green';
+        phoneBadge.innerText = '🟢 ONLINE';
+        offlineCallout.style.display = 'none';
+        phoneNetText.innerText = '4G';
+        setPipelineStep(6);
+      } else if (data.state === 'LIMITED') {
+        text.innerText = '🟠 LIMITED';
+        ping.innerText = (data.latency_ms || 780) + 'ms';
+        phoneBadge.className = 'badge badge-amber';
+        phoneBadge.innerText = '🟠 LIMITED';
+        offlineCallout.style.display = 'block';
+        phoneNetText.innerText = '2G (34% Loss)';
+        setPipelineStep(3);
+      } else {
+        text.innerText = '🔴 OFFLINE';
+        ping.innerText = '∞ ms';
+        phoneBadge.className = 'badge badge-red';
+        phoneBadge.innerText = '🔴 OFFLINE';
+        offlineCallout.style.display = 'block';
+        phoneNetText.innerText = 'No Service';
+        setPipelineStep(1);
+      }
+
+      // Sync simulator card styling
+      ['card-sim-online', 'card-sim-limited', 'card-sim-offline'].forEach(id => {
+        const c = document.getElementById(id);
+        if (c) c.style.borderColor = 'transparent';
+      });
+      const activeCard = document.getElementById('card-sim-' + data.state.toLowerCase());
+      if (activeCard) activeCard.style.borderColor = 'var(--primary-light)';
+
+      document.getElementById('sim-recommendation-text').innerText = data.recommendation || '';
+      document.getElementById('sim-latency-display').innerText = (data.latency_ms || 0) + ' ms';
+      document.getElementById('sim-loss-display').innerText = (data.packet_loss_pct || 0) + '%';
+      
+      const mConn = document.getElementById('merchant-conn-badge');
+      if (mConn) {
+        mConn.className = 'badge badge-' + (data.state === 'ONLINE' ? 'green' : data.state === 'LIMITED' ? 'amber' : 'red');
+        mConn.innerText = 'CONNECTIVITY: ' + data.state;
+      }
+    }
+
+    // Payment Flow Steps (Section 5, 6, 7)
+    function openPaymentFlow(merchantId = 'merch_sharma_01', amount = 450) {
+      pendingPaymentParams = { merchantId, amount };
+      const merchName = merchantId === 'merch_sharma_01' ? 'Sharma General Store' :
+                        merchantId === 'merch_patel_02' ? 'Patel Medical & General' :
+                        merchantId === 'merch_metro_04' ? 'Metro Underground Cafe' : 'Verified Merchant';
+      
+      document.getElementById('confirm-amount').innerText = amount;
+      document.getElementById('confirm-merchant-name').innerText = merchName;
+      document.getElementById('confirm-payment-mode').innerText = currentNetworkState;
+      document.getElementById('confirm-rem-balance').innerText = '₹' + (1850 - amount);
+      
+      openModal('modal-confirm-pay');
+    }
+
+    async function executeConfirmedPayment(bypassDuplicate = false) {
+      closeModal('modal-confirm-pay');
+      const { merchantId, amount } = pendingPaymentParams;
+
+      try {
+        const endpoint = currentNetworkState === 'ONLINE' ? '/payment/initiate' : '/payment/offline';
+        const res = await apiFetch(endpoint, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            merchant_id: merchantId,
+            customer_id: 'cust_priya_01',
+            amount: amount,
+            bypass_duplicate_check: bypassDuplicate
+          })
+        });
+
+        if (res.status === 409) {
+          // Duplicate Detected!
+          playBeep(false);
+          openModal('modal-duplicate-warning');
+          return;
+        }
+
+        const data = await res.json();
+        lastRecordedTxn = data;
+
+        playBeep(true);
+
+        // Show offline success modal
+        document.getElementById('success-txn-id').innerText = data.transaction_id || data.txn_id || 'DRX-2026-001284';
+        document.getElementById('success-amount').innerText = amount;
+        document.getElementById('success-merchant').innerText = data.merchant || data.merchant_name || 'Sharma General Store';
+        document.getElementById('success-status').innerText = data.status || 'WAITING FOR SYNC';
+        document.getElementById('success-hash').innerText = data.integrity_hash || '8f3a92bd41e06927c3d9b1a504ef32...';
+
+        // Update customer balance on phone
+        if (data.available_offline_balance !== undefined) {
+          document.getElementById('cust-offline-balance').innerText = data.available_offline_balance;
+          document.getElementById('cust-capacity-label').innerText = '₹' + data.available_offline_balance + ' / ₹5,000';
+          const pct = (data.available_offline_balance / 5000) * 100;
+          document.getElementById('cust-capacity-bar').style.width = pct + '%';
+        }
+
+        const pendingEl = document.getElementById('cust-pending-sync');
+        if (pendingEl) pendingEl.innerText = (parseInt(pendingEl.innerText) || 2) + 1;
+
+        setPipelineStep(2); // Locally queued
+        openModal('modal-success-pay');
+      } catch (err) {
+        console.error('Payment error', err);
+        alert('Network request error: ' + err.message);
+      }
+    }
+
+    function simulateDuplicateFlow() {
+      // Prime duplicate modal directly
+      playBeep(false);
+      openModal('modal-duplicate-warning');
+    }
+
+    function viewExistingPaymentFromDuplicate() {
+      closeModal('modal-duplicate-warning');
+      document.getElementById('success-txn-id').innerText = 'DRX-2026-001284';
+      document.getElementById('success-amount').innerText = '450';
+      document.getElementById('success-merchant').innerText = 'Sharma General Store';
+      document.getElementById('success-status').innerText = 'WAITING FOR SYNC';
+      document.getElementById('success-hash').innerText = '8f3a92bd41e06927c3d9b1a504ef32...';
+      openModal('modal-success-pay');
+    }
+
+    function continueDuplicateAnyway() {
+      closeModal('modal-duplicate-warning');
+      executeConfirmedPayment(true);
+    }
+
+    function openDigitalReceiptModal() {
+      closeModal('modal-success-pay');
+      document.getElementById('receipt-amount').innerText = pendingPaymentParams.amount || 450;
+      document.getElementById('receipt-merchant').innerText = 'Sharma General Store';
+      document.getElementById('receipt-txn-id').innerText = lastRecordedTxn?.transaction_id || 'DRX-2026-001284';
+      document.getElementById('receipt-mode').innerText = currentNetworkState;
+      document.getElementById('receipt-status').innerText = currentNetworkState === 'ONLINE' ? 'Settled Online' : 'Recorded — awaiting synchronization';
+      document.getElementById('receipt-hash-short').innerText = 'HASH: ' + (lastRecordedTxn?.short_hash || '8f3a...92bd');
+      openModal('modal-digital-receipt');
+    }
+
+    // Load Merchant Dashboard (Section 15)
+    async function loadMerchantDashboard() {
+      try {
+        const res = await apiFetch('/merchant/dashboard');
+        const d = await res.json();
+
+        document.getElementById('merch-today-sales').innerText = '₹' + d.todays_sales.toLocaleString('en-IN');
+        document.getElementById('merch-offline-sales').innerText = '₹' + d.offline_sales.toLocaleString('en-IN');
+        document.getElementById('merch-pending-sync').innerText = d.pending_sync;
+        document.getElementById('merch-successful').innerText = d.successful;
+        document.getElementById('merch-exceptions').innerText = d.exceptions;
+        document.getElementById('merch-duplicates').innerText = d.duplicate_attempts;
+
+        const tbody = document.getElementById('merchant-txns-tbody');
+        tbody.innerHTML = '';
+        (d.transactions || []).forEach(t => {
+          const row = document.createElement('tr');
+          const isPending = t.status === 'WAITING_FOR_SYNC' || t.status === 'LOCALLY_QUEUED';
+          row.innerHTML = `
+            <td class="mono"><strong>${t.txn_id}</strong></td>
+            <td>Priya Sharma</td>
+            <td><strong>₹${t.amount}</strong></td>
+            <td><span class="badge ${t.mode === 'OFFLINE' ? 'badge-amber' : 'badge-green'}">${t.mode}</span></td>
+            <td>${t.created_at}</td>
+            <td><span class="badge ${isPending ? 'badge-amber' : t.status === 'SETTLED' ? 'badge-green' : 'badge-red'}">${t.status}</span></td>
+            <td>${isPending ? '<span style="color:#fbbf24;">⏳ Pending</span>' : '<span style="color:#34d399;">✓ Synced</span>'}</td>
+            <td><button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="viewReceiptFromTable('${t.txn_id}', ${t.amount})">Receipt</button></td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        console.error('Merchant dashboard load error', err);
+      }
+    }
+
+    function viewReceiptFromTable(txnId, amount) {
+      document.getElementById('receipt-amount').innerText = amount;
+      document.getElementById('receipt-merchant').innerText = 'Sharma General Store';
+      document.getElementById('receipt-txn-id').innerText = txnId;
+      document.getElementById('receipt-mode').innerText = 'OFFLINE';
+      document.getElementById('receipt-status').innerText = 'Recorded — Verified Digest';
+      document.getElementById('receipt-hash-short').innerText = 'HASH: 8f3a...92bd';
+      openModal('modal-digital-receipt');
+    }
+
+    // Auto-Sync and Failure Simulation (Section 13 & 19)
+    async function triggerSyncNow() {
+      const consoleOut = document.getElementById('sync-console-output');
+      consoleOut.innerHTML += `<br>[SYNC] Triggering background synchronization daemon...`;
+      setPipelineStep(4); // Syncing
+
+      try {
+        const res = await apiFetch('/sync', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}' });
+        const d = await res.json();
+        playBeep(true);
+        consoleOut.innerHTML += `<br>[SUCCESS] Synchronized ${d.synced_count} transactions: ${d.successful} Settled, ${d.requires_review} Review`;
+        setPipelineStep(5); // Reconciled
+        loadMerchantDashboard();
+      } catch (err) {
+        consoleOut.innerHTML += `<br>[ERROR] Sync call failed: ${err.message}`;
+      }
+    }
+
+    async function simulateSyncFailureWithBackoff() {
+      const consoleOut = document.getElementById('sync-console-output');
+      consoleOut.innerHTML += `<br>[TEST] Simulating Network Failure & Exponential Backoff...`;
+      playBeep(false);
+
+      try {
+        const res = await apiFetch('/sync', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ simulate_failure: true })
+        });
+        const d = await res.json();
+        consoleOut.innerHTML += `<br>[WARN] Attempt 1 Failed: Socket Timeout (504)`;
+        consoleOut.innerHTML += `<br>[WARN] Attempt 2: Exponential Backoff (2000ms pause)`;
+        consoleOut.innerHTML += `<br>[INFO] Queued for automatic retry upon next signal handshake.`;
+      } catch (err) {
+        consoleOut.innerHTML += `<br>[ERROR] ${err.message}`;
+      }
+    }
+
+    async function simulateHashMismatchInvestigation() {
+      const consoleOut = document.getElementById('sync-console-output');
+      consoleOut.innerHTML += `<br>[ALERT] Simulating Tampered Hash Payload...`;
+      playBeep(false);
+
+      try {
+        const res = await apiFetch('/demo/action', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action: 'simulate_hash_mismatch' })
+        });
+        const d = await res.json();
+        consoleOut.innerHTML += `<br>[SECURITY] Hash Mismatch detected on ${d.tampered_txn_id}!`;
+        consoleOut.innerHTML += `<br>[DECISION] Transaction rejected & flagged for fraud investigation.`;
+      } catch (err) {
+        consoleOut.innerHTML += `<br>[ERROR] ${err.message}`;
+      }
+    }
+
+    // Vault records loader
+    async function loadVaultRecords() {
+      try {
+        const res = await apiFetch('/vault/records');
+        const d = await res.json();
+        const tbody = document.getElementById('vault-records-tbody');
+        tbody.innerHTML = '';
+        (d.records || []).forEach(r => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="mono"><strong>${r.txn_id}</strong></td>
+            <td>${r.merchant_name}</td>
+            <td><strong>₹${r.amount}</strong></td>
+            <td>${r.timestamp}</td>
+            <td class="mono">${r.nonce}</td>
+            <td class="mono" style="color:#60a5fa;">${r.short_hash}</td>
+            <td class="mono" style="color:#34d399;">${r.status === 'SETTLED' ? r.short_hash : 'AWAIT_SYNC'}</td>
+            <td><span class="badge ${r.integrity_check === 'PASS' ? 'badge-green' : 'badge-red'}">${r.integrity_check}</span></td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Risk Calculator (Section 11)
+    async function updateRiskCalculator() {
+      const amount = parseFloat(document.getElementById('risk-calc-amount-slider').value);
+      document.getElementById('risk-calc-amount-label').innerText = '₹' + amount.toLocaleString('en-IN');
+      const merchantId = document.getElementById('risk-calc-merchant').value;
+      const deviceTrust = document.getElementById('risk-calc-device').value;
+
+      try {
+        const res = await apiFetch('/risk/evaluate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            merchant_id: merchantId,
+            customer_id: 'cust_priya_01',
+            amount: amount,
+            is_offline: true,
+            bypass_duplicate: true
+          })
+        });
+        const d = await res.json();
+
+        // Adjust score if untrusted device selected for demo
+        let score = d.risk_score;
+        let level = d.risk_level;
+        let allowed = d.allowed;
+        let reason = d.reason;
+
+        if (deviceTrust === 'untrusted') {
+          score = Math.min(99, score + 45);
+          level = score > 60 ? 'HIGH RISK' : 'MEDIUM RISK';
+          allowed = score <= 60;
+          reason = 'Untrusted device hardware fingerprint. Online OTP required.';
+        }
+
+        document.getElementById('risk-score-val').innerText = score + ' / 100';
+        document.getElementById('risk-level-val').innerText = level;
+
+        const card = document.getElementById('risk-score-display-card');
+        const badge = document.getElementById('risk-decision-badge');
+        const scoreVal = document.getElementById('risk-score-val');
+        const levelVal = document.getElementById('risk-level-val');
+
+        if (level === 'LOW RISK') {
+          card.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+          scoreVal.style.color = '#34d399';
+          levelVal.style.color = '#34d399';
+          badge.className = 'badge badge-green';
+          badge.innerText = '✓ ALLOW PAYMENT';
+        } else if (level === 'MEDIUM RISK') {
+          card.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+          scoreVal.style.color = '#fbbf24';
+          levelVal.style.color = '#fbbf24';
+          badge.className = 'badge badge-amber';
+          badge.innerText = '⚠️ ACCEPT WITH AUDIT';
+        } else {
+          card.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+          scoreVal.style.color = '#f87171';
+          levelVal.style.color = '#f87171';
+          badge.className = 'badge badge-red';
+          badge.innerText = '✗ BLOCK OFFLINE';
+        }
+
+        document.getElementById('risk-reason-text').innerText = reason;
+
+        // Render factors
+        const list = document.getElementById('risk-factors-list');
+        list.innerHTML = '';
+        (d.factors || []).forEach(f => {
+          const item = document.createElement('div');
+          item.style.cssText = 'display:flex; justify-content:space-between; font-size:11px; padding:6px 0; border-bottom:1px solid #162030;';
+          item.innerHTML = `
+            <span style="color:var(--text-muted);">${f.name}:</span>
+            <span style="color:${f.status === 'PASS' ? '#34d399' : f.status === 'WARN' ? '#fbbf24' : '#f87171'}; font-weight:600;">
+              ${f.status} — ${f.detail}
+            </span>
+          `;
+          list.appendChild(item);
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Reconciliation Run (Section 14)
+    async function runReconciliationAudit() {
+      try {
+        const res = await apiFetch('/reconcile', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}' });
+        const d = await res.json();
+        const tbody = document.getElementById('reconcile-records-tbody');
+        tbody.innerHTML = '';
+        (d.records || []).forEach(r => {
+          const row = document.createElement('tr');
+          const isMatch = r.reconciliation_outcome === 'MATCH';
+          row.innerHTML = `
+            <td class="mono"><strong>${r.txn_id}</strong></td>
+            <td>${r.merchant_name}</td>
+            <td><strong>₹${r.amount}</strong></td>
+            <td><span class="badge ${r.mode === 'OFFLINE' ? 'badge-amber' : 'badge-green'}">${r.mode}</span></td>
+            <td>${r.local_status}</td>
+            <td><span class="badge ${isMatch ? 'badge-green' : 'badge-red'}">${r.reconciliation_outcome}</span></td>
+            <td class="mono" style="color:#60a5fa;">${r.local_hash}</td>
+            <td class="mono" style="color:#34d399;">${r.server_hash}</td>
+            <td>${r.time}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Observability Charts (Section 17)
+    async function loadObservabilityCharts() {
+      try {
+        const res = await apiFetch('/metrics/observability');
+        const d = await res.json();
+
+        document.getElementById('obs-total-txns').innerText = d.totals.total_transactions;
+        document.getElementById('obs-offline-txns').innerText = d.totals.offline_transactions;
+        document.getElementById('obs-settled-txns').innerText = d.totals.reconciled_transactions;
+        document.getElementById('obs-dup-txns').innerText = d.totals.duplicate_attempts;
+
+        drawDonutChart('chart-status', d.charts.by_status);
+        drawBarChart('chart-volume', d.charts.volume_by_hour);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function drawDonutChart(canvasId, items) {
+      const c = document.getElementById(canvasId);
+      if (!c) return;
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, c.width, c.height);
+
+      const total = items.reduce((acc, i) => acc + i.value, 0) || 1;
+      let startAngle = -0.5 * Math.PI;
+      const cx = 120, cy = 100, radius = 70, innerRadius = 45;
+
+      items.forEach(item => {
+        const sliceAngle = (item.value / total) * 2 * Math.PI;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
+        ctx.arc(cx, cy, innerRadius, startAngle + sliceAngle, startAngle, true);
+        ctx.closePath();
+        ctx.fillStyle = item.color;
+        ctx.fill();
+        startAngle += sliceAngle;
+      });
+
+      // Legend
+      ctx.font = '11px sans-serif';
+      items.forEach((item, idx) => {
+        ctx.fillStyle = item.color;
+        ctx.fillRect(230, 45 + idx * 30, 12, 12);
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillText(`${item.name} (${item.value})`, 250, 55 + idx * 30);
+      });
+    }
+
+    function drawBarChart(canvasId, items) {
+      const c = document.getElementById(canvasId);
+      if (!c) return;
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, c.width, c.height);
+
+      const maxVal = 7;
+      const w = 32, gap = 16, startX = 40, baseY = 160;
+
+      items.forEach((item, idx) => {
+        const x = startX + idx * (w + gap);
+        const offH = (item.offline / maxVal) * 110;
+        const onH = (item.online / maxVal) * 110;
+
+        // Offline bar (amber)
+        ctx.fillStyle = '#f59e0b';
+        ctx.fillRect(x, baseY - offH, w / 2 - 2, offH);
+
+        // Online bar (blue)
+        ctx.fillStyle = '#3b82f6';
+        ctx.fillRect(x + w / 2, baseY - onH, w / 2 - 2, onH);
+
+        // Label
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '9px monospace';
+        ctx.fillText(item.time.split(' ')[0], x - 4, baseY + 16);
+      });
+    }
+
+    // Demo Actions Executed by Judge Controls
+    async function executeDemoAction(action) {
+      try {
+        const res = await apiFetch('/demo/action', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action })
+        });
+        const d = await res.json();
+        playBeep(true);
+
+        if (action === 'internet_loss') {
+          setNetworkState('OFFLINE');
+          switchTab('tab-customer');
+        } else if (action === 'internet_restore') {
+          setNetworkState('ONLINE');
+          switchTab('tab-merchant');
+        } else if (action === 'simulate_duplicate') {
+          simulateDuplicateFlow();
+        } else if (action === 'simulate_sync_failure') {
+          switchTab('tab-connectivity');
+          simulateSyncFailureWithBackoff();
+        } else if (action === 'simulate_hash_mismatch') {
+          switchTab('tab-connectivity');
+          simulateHashMismatchInvestigation();
+        } else if (action === 'simulate_successful_reconcile') {
+          switchTab('tab-reconcile');
+          runReconciliationAudit();
+        } else if (action === 'reset_demo') {
+          alert('Demo state reset to initial conditions.');
+          location.reload();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // 8-Scene Guided Demo Walkthrough (Section 26)
+    const SCENES = [
+      {
+        idx: 1,
+        title: "Customer Online",
+        text: "Priya Sharma is online with ₹1,850 offline reserve balance and strong 4G connectivity.",
+        action: () => { setNetworkState('ONLINE'); switchTab('tab-customer'); }
+      },
+      {
+        idx: 2,
+        title: "Switch to Offline",
+        text: "Simulate underground subway or rural network outage. Customer App enters resilient mode.",
+        action: () => { setNetworkState('OFFLINE'); switchTab('tab-customer'); }
+      },
+      {
+        idx: 3,
+        title: "Pay ₹450 to Sharma",
+        text: "Scan Sharma General Store QR. Device records payment securely in local keystore as DRX-2026-001284.",
+        action: () => { openPaymentFlow('merch_sharma_01', 450); }
+      },
+      {
+        idx: 4,
+        title: "Duplicate Attempt",
+        text: "User accidentally taps pay again. Multi-variable duplicate engine intercepts payment!",
+        action: () => { simulateDuplicateFlow(); }
+      },
+      {
+        idx: 5,
+        title: "Restore & Auto-Sync",
+        text: "Signal returns. Auto-sync daemon wakes up, validates HMAC-SHA256 digest, and settles transaction.",
+        action: () => { setNetworkState('ONLINE'); switchTab('tab-connectivity'); triggerSyncNow(); }
+      },
+      {
+        idx: 6,
+        title: "Merchant Dashboard",
+        text: "Merchant POS reflects ₹24,850 sales, ₹450 reconciled, and digital receipt is ready.",
+        action: () => { switchTab('tab-merchant'); }
+      },
+      {
+        idx: 7,
+        title: "Transaction Lifecycle",
+        text: "Audit ledger verifies state machine: CREATED → QUEUED → SYNCED → RECONCILED → SETTLED.",
+        action: () => { switchTab('tab-reconcile'); }
+      },
+      {
+        idx: 8,
+        title: "Architecture Proof",
+        text: "'Offline is not the feature. Resilience is the feature.' Built on DRUNIX in collaboration with Citi.",
+        action: () => { switchTab('tab-architecture'); }
+      }
+    ];
+
+    function executeScene(idx) {
+      currentSceneIdx = idx;
+      const s = SCENES[idx - 1];
+      document.querySelectorAll('.scene-step-card').forEach((el, i) => {
+        el.classList.toggle('active', i + 1 === idx);
+      });
+      document.getElementById('scene-feedback-text').innerText = `Scene ${idx}: ${s.text}`;
+      s.action();
+    }
+
+    function nextScene() {
+      currentSceneIdx = currentSceneIdx >= SCENES.length ? 1 : currentSceneIdx + 1;
+      executeScene(currentSceneIdx);
+    }
+
+    function startGuidedDemo() {
+      executeScene(1);
+    }
+
+    // API Explorer Runner (Section 24)
+    async function runApiTest(method, path, body) {
+      document.getElementById('api-status-badge').innerText = 'Calling...';
+      const pre = document.getElementById('api-response-pre');
+      pre.innerText = `[${method}] ${path} ...`;
+
+      try {
+        const opts = { method, headers: {'Content-Type': 'application/json'} };
+        if (body && method !== 'GET') opts.body = JSON.stringify(body);
+
+        const res = await apiFetch(path, opts);
+        const data = await res.json();
+
+        document.getElementById('api-status-badge').innerText = `HTTP ${res.status}`;
+        document.getElementById('api-status-badge').className = res.ok ? 'badge badge-green' : 'badge badge-red';
+        pre.innerText = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('api-status-badge').innerText = 'ERROR';
+        document.getElementById('api-status-badge').className = 'badge badge-red';
+        pre.innerText = err.message;
+      }
+    }
+
+    // Initial on-load initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      apiFetch('/connectivity/status').then(r => r.json()).then(d => updateNetworkUI(d));
+      loadMerchantDashboard();
+      updateRiskCalculator();
+    });
+  </script>
+</body>
+</html>
